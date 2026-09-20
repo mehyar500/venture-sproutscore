@@ -313,3 +313,8 @@ footer a:hover { color: var(--text); }
   .eyebrow { color: #0a7a4e; }
   .sev-tag, .status-pill { border: 1px solid #999; }
 }
+
+/* Funnel: masked pre-capture counts + stale-data banner */
+.num.mask { color: var(--muted); letter-spacing: 6px; user-select: none; -webkit-user-select: none; }
+.stale-banner { background: #FFF8E1; border: 1px solid #E8C547; color: #5C4A00; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; margin-top: 14px; }
+.centered { text-align: center; }

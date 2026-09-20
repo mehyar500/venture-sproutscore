@@ -104,6 +104,12 @@ function standingDisplay(verdict) {
   return "Worse than the NYC average";
 }
 
+function titleCase(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
 async function getCenter(id) {
   const idx = await centerIndex();
   return idx.get(id) || null;
@@ -201,8 +207,16 @@ async function fullReport(c) {
   const rate = parseFloat(c.rate) || 0;
   const verdict = standingVerdict(rate, avg);
 
-  // nearby: same ZIP, ranked by violation rate (lower = better)
-  const nearby = b.SPROUT_CENTERS.filter((x) => x.zip === c.zip && x.id !== c.id)
+  // nearby: same ZIP, ranked by violation rate (lower = better);
+  // widen to borough when fewer than 5 centers share the ZIP; ties share rank
+  let scopeLabel = c.zip ? `ZIP ${c.zip}` : "nearby centers";
+  let pool = b.SPROUT_CENTERS.filter((x) => x.zip && x.zip === c.zip);
+  if (pool.length < 5 && c.boro) {
+    pool = b.SPROUT_CENTERS.filter((x) => x.boro === c.boro);
+    scopeLabel = titleCase(c.boro) + " (borough)";
+  }
+  const nearby = pool
+    .filter((x) => x.id !== c.id)
     .map((x) => ({ id: x.id, name: x.name, rate: parseFloat(x.rate) || 0, flagged: x.flag }))
     .sort((a, z) => a.rate - z.rate);
   const rankPos = nearby.filter((x) => x.rate < rate).length + 1;
@@ -250,16 +264,16 @@ async function fullReport(c) {
           `${avg}% for ${c.cohort || "NYC centers"} — ${standingDisplay(verdict).toLowerCase()}.`,
       },
       vs_nearby: {
-        scope: c.zip ? `ZIP ${c.zip}` : "nearby",
+        scope: scopeLabel,
         centers: rankTotal,
         rank: `${rankPos} of ${rankTotal}`,
         nearby_avg_rate_pct: nearbyAvg == null ? null : Math.round(nearbyAvg * 10) / 10,
         plain:
           nearby.length === 0
-            ? "No other centers in our data share this ZIP."
+            ? "No other centers in our data share this area."
             : rankPos <= Math.ceil(rankTotal / 2)
-              ? `Ranked ${rankPos} of ${rankTotal} centers in ZIP ${c.zip} by violation rate — cleaner than most nearby.`
-              : `Ranked ${rankPos} of ${rankTotal} centers in ZIP ${c.zip} by violation rate — more flagged than most nearby.`,
+              ? `Ranked ${rankPos} of ${rankTotal} centers in ${scopeLabel} by violation rate — cleaner than most nearby.`
+              : `Ranked ${rankPos} of ${rankTotal} centers in ${scopeLabel} by violation rate — more flagged than most nearby.`,
       },
     },
     tour_questions: tourQuestionsFor(decoded),

@@ -123,6 +123,26 @@ r = await reportMod.onRequestGet({ env, request: new Request("http://x/api/repor
 body = await r.json();
 check("demo mode → 200 sample report", r.status === 200 && body.ok === true && body.demo === true);
 
+// 7. nearby comparison: ZIP scope vs borough widening (< 5 centers in ZIP)
+db._tables.sproutscore_orders.set("test-token-smallzip-abcdef0123456789",
+  { center_id: "DC11176", status: "ready" }); // ZIP 11419 has 4 centers → widen to Queens
+r = await reportMod.onRequestGet({ env, request: new Request("http://x/api/report?token=test-token-smallzip-abcdef0123456789", { headers: { accept: "application/json" } }) });
+body = await r.json();
+const nb = body.report?.comparison?.vs_nearby;
+check("small-ZIP center widens to borough scope", r.status === 200 && /borough/.test(nb?.scope || ""),
+  `scope=${nb?.scope}, rank=${nb?.rank}`);
+const dc1000nb = (await (await reportMod.onRequestGet({ env, request: new Request("http://x/api/report?token=test-token-0123456789abcdef", { headers: { accept: "application/json" } }) })).json()).report?.comparison?.vs_nearby;
+check("large-ZIP center keeps ZIP scope", /^ZIP \d+/.test(dc1000nb?.scope || ""), `scope=${dc1000nb?.scope}`);
+
+// 8. status semantics: OPEN ≠ proof of still-broken; status_plain carries the honest wording
+db._tables.sproutscore_orders.set("test-token-openstatus-0123456789abcdef",
+  { center_id: "DC10478", status: "ready" }); // QSAC — has OPEN violations
+r = await reportMod.onRequestGet({ env, request: new Request("http://x/api/report?token=test-token-openstatus-0123456789abcdef", { headers: { accept: "application/json" } }) });
+body = await r.json();
+const openV = body.report?.violations?.find((v) => v.status === "OPEN");
+check("OPEN violation has status_plain with no-correction wording",
+  r.status === 200 && !!openV && /no correction recorded/i.test(openV.status_plain || ""), openV ? `${openV.code}: ${openV.status_plain}` : "no OPEN violation in fixture");
+
 const failed = results.filter((x) => !x.pass);
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
 process.exit(failed.length ? 1 : 0);

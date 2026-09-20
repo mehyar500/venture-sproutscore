@@ -8,13 +8,13 @@ const OUT = process.argv[3] || "screenshots/pass1";
 const EXE = "/home/hatch/.cache/ms-playwright/chrome-linux64/chrome";
 
 const SHOTS = [
-  // [name, url, {fullPage, waitMs, pdf}]
+  // [name, url, {fullPage, waitMs, pdf, reveal}]
   ["01-landing-hero", "/index.html", { fullPage: false }],
   ["02-landing-scroll", "/index.html", { fullPage: true }],
   ["03-search-results", "/search.html?q=sunshine", { fullPage: true, waitMs: 1200 }],
-  ["04-teaser-top", "/center.html?id=DC1000", { fullPage: false, waitMs: 1200 }],
-  ["05-teaser-flags", "/center.html?id=DC1000", { fullPage: true, waitMs: 1200 }],
-  ["06-teaser-paywall", "/center.html?id=DC1000", { fullPage: true, waitMs: 1200, scrollTo: "#paywall" }],
+  ["04-center-masked", "/center.html?id=DC1000", { fullPage: true, waitMs: 1200 }],
+  ["05-center-revealed", "/center.html?id=DC1000", { fullPage: true, waitMs: 1200, reveal: true }],
+  ["06-center-paywall", "/center.html?id=DC1000", { fullPage: true, waitMs: 1200, reveal: true, scrollTo: "#paywall" }],
   ["07-report-top", "/report.html?demo=1", { fullPage: false, waitMs: 1500 }],
   ["08-report-full", "/report.html?demo=1", { fullPage: true, waitMs: 1500 }],
   ["09-report-print", "/report.html?demo=1", { pdf: true, waitMs: 1500 }],
@@ -34,6 +34,12 @@ fs.mkdirSync(OUT, { recursive: true });
 for (const [name, url, opt] of SHOTS) {
   try {
     await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 30000 });
+    if (opt.reveal) {
+      // simulate a completed email capture so screenshots show the revealed free result
+      const id = new URL(BASE + url).searchParams.get("id");
+      await page.evaluate((k) => localStorage.setItem(k, "1"), "ss_reveal_" + id);
+      await page.reload({ waitUntil: "networkidle", timeout: 30000 });
+    }
     if (opt.scrollTo) await page.evaluate((s) => document.querySelector(s)?.scrollIntoView(), opt.scrollTo);
     if (opt.fullPage) {
       // fullPage stitches repeat sticky elements — pin the header static for capture only

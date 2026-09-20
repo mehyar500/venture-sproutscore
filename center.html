@@ -34,64 +34,82 @@
       <p class="lede" id="t-addr">—</p>
     </section>
 
-    <section>
+    <!-- pre-capture hook: counts masked (no real numbers in the DOM, aria, or copied text) -->
+    <section id="hook-sec">
+      <p class="eyebrow">The city's record for this center</p>
       <div class="stats">
-        <div class="stat"><div class="num" id="t-inspections">—</div><div class="lbl">inspections on record</div></div>
-        <div class="stat"><div class="num" id="t-flagged">—</div><div class="lbl">flagged inspections</div></div>
+        <div class="stat"><div class="num mask" aria-label="Hidden until you enter your email">◆◆</div><div class="lbl">inspections found</div></div>
+        <div class="stat"><div class="num mask" aria-label="Hidden until you enter your email">◆</div><div class="lbl">flagged inspections</div></div>
       </div>
-      <div class="standing">
-        <div class="badge" id="t-badge">📊</div>
-        <p><strong id="t-standing-line">—</strong><br><span id="t-standing-detail" style="color:var(--muted)">—</span>
-        <span class="data-asof">Last inspection: <span id="t-last">—</span> · Data as of <span id="t-asof">—</span> · Source: NYC DOHMH — no newer rows published</span></p>
-      </div>
+      <p class="centered" style="font-size:14px;color:var(--muted)">The city inspected this center. Enter your email below to reveal your free result — inspection count, flagged count, standing vs the NYC average, and last inspection date.</p>
+      <div class="stale-banner">Inspection history: 2020–2023. The city has not published newer daycare inspection data since April 2023 — always confirm current conditions on your tour.</div>
     </section>
 
-    <section id="flags-sec" class="hidden">
-      <p class="eyebrow">Flagged inspections</p>
-      <h2>What the inspectors flagged</h2>
-      <p class="lede">The codes below are the raw record. The $19 report translates every one into plain English — what happened, how serious it is, and whether the city recorded a correction.</p>
-      <ul class="flags" id="t-flags"></ul>
-    </section>
-
-    <section id="clean-sec" class="hidden">
-      <div class="standing" style="border-color:var(--accent)">
-        <div class="badge">✅</div>
-        <p><strong>A clean record.</strong><br><span style="color:var(--muted)">No flagged inspections on file. The $19 report still verifies the details behind each visit — clean records are worth confirming, not assuming.</span></p>
-      </div>
-    </section>
-
-    <!-- email capture: the funnel entry -->
+    <!-- email capture: the gate -->
     <section id="capture-sec">
       <div class="form-card" style="border-color:var(--accent)">
-        <p class="eyebrow">Free result by email</p>
-        <h2 style="margin-top:0">Email me my free result + 3 tour questions</h2>
-        <p class="lede">We'll send this safety check to your inbox, plus 3 sharp questions tailored to this center's record to ask on your tour.</p>
+        <p class="eyebrow">Free result</p>
+        <h2 style="margin-top:0">Enter your email to reveal your free result</h2>
+        <p class="lede">Your inspection + flagged counts, standing vs the NYC average, last inspection date, and 3 tour questions for this center — free, in your inbox.</p>
         <form id="capture-form" novalidate>
           <div class="field">
             <label for="c-email">Email address</label>
             <input type="email" id="c-email" autocomplete="email" placeholder="you@example.com">
-            <p class="hint">Your result + 3 tour questions. Occasional SproutScore updates. <a href="unsubscribe.html">Unsubscribe anytime</a> in one click. See <a href="privacy.html">Privacy</a>.</p>
+            <p class="hint">Your free result + 3 tour questions. Occasional SproutScore updates. <a href="unsubscribe.html">Unsubscribe anytime</a> in one click. See <a href="privacy.html">Privacy</a>.</p>
           </div>
-          <button class="btn btn-primary btn-block" type="submit" id="capture-btn">Email me my free result 🌱</button>
+          <button class="btn btn-primary btn-block" type="submit" id="capture-btn">Reveal my free result 🌱</button>
           <div class="status" id="capture-status" role="status"></div>
         </form>
       </div>
-      <div id="tour-questions" class="hidden">
+    </section>
+
+    <!-- revealed free result (after successful capture) -->
+    <div id="free-result" class="hidden">
+      <section>
+        <p class="eyebrow">Your free result 🌱</p>
+        <div class="stats">
+          <div class="stat"><div class="num" id="r-inspections">—</div><div class="lbl">inspections on record</div></div>
+          <div class="stat"><div class="num" id="r-flagged">—</div><div class="lbl">flagged inspections</div></div>
+        </div>
+        <div class="standing">
+          <div class="badge" id="r-badge">📊</div>
+          <p><strong id="r-standing-line">—</strong><br><span id="r-standing-detail" style="color:var(--muted)">—</span>
+          <span class="data-asof">Last inspection: <span id="r-last">—</span> · Data as of Apr 24, 2023 · Source: NYC DOHMH</span></p>
+        </div>
+        <div id="r-lowdata" class="disclaimer hidden" style="margin-top:12px"></div>
+        <div class="stale-banner">Inspection history: 2020–2023. The city has not published newer daycare inspection data since April 2023 — always confirm current conditions on your tour.</div>
+      </section>
+
+      <section id="flags-sec" class="hidden">
+        <p class="eyebrow">Flagged inspections</p>
+        <h2>What the inspectors flagged</h2>
+        <p class="lede">The codes below are the raw record. The $19 report translates every one into plain English — what happened, how serious it is, and whether the city recorded a correction.</p>
+        <ul class="flags" id="r-flags"></ul>
+      </section>
+
+      <section id="clean-sec" class="hidden">
+        <div class="standing" style="border-color:var(--accent)">
+          <div class="badge">✅</div>
+          <p><strong>A clean record.</strong><br><span style="color:var(--muted)">No flagged inspections on file. The $19 report still verifies the details behind each visit — clean records are worth confirming, not assuming.</span></p>
+        </div>
+      </section>
+
+      <section id="tour-sec">
         <p class="eyebrow">Your 3 free tour questions</p>
         <h2>Ask these on your tour.</h2>
-        <div id="tq-list"></div>
-      </div>
-    </section>
+        <div id="r-tq-list"></div>
+      </section>
+    </div>
 
     <!-- paywall: upgrade framing -->
     <section id="paywall">
       <p class="eyebrow">The full picture — $19</p>
-      <h2>You've seen the headline.<br>Here's the whole story.</h2>
+      <h2>The free result is the headline.<br>Here's the whole story.</h2>
       <p class="lede">The free check tells you <em>that</em> something was flagged. The decoded report tells you <em>what it means for your child</em>.</p>
       <div class="before-after">
         <div class="ba-panel before">
           <div class="ba-label">What you have now (free)</div>
-          <div class="raw-record" id="ba-raw">VIOLATION 47.39(c) — CORRECTED</div>
+          <div class="raw-record" id="ba-raw">VIOLATION CODE — masked until you reveal your free result</div>
         </div>
         <div class="ba-panel after">
           <div class="ba-label">What $19 unlocks</div>
@@ -133,7 +151,7 @@
 
     <section>
       <div class="disclaimer">
-        <strong>Real NYC records, frozen in time.</strong> This page shows the center's actual NYC DOHMH inspection history — but the city's data ends April 2023, and no newer rows have been published. <strong>Not childcare advice:</strong> always tour in person and verify with the NYC DOHMH.
+        <strong>Not childcare advice:</strong> always tour in person and verify with the NYC DOHMH. Paid reports include a printable PDF of every decoded violation.
       </div>
     </section>
   </div>
@@ -141,7 +159,7 @@
   <section id="not-found" class="hidden centered">
     <p class="eyebrow">Not found</p>
     <h2>That center isn't in our directory.</h2>
-    <p class="lede">It may be unlicensed, outside NYC, or listed under a different name.</p>
+    <p class="lede">We couldn't find it in NYC's published daycare inspection records (2020–2023). Check the spelling, or try the legal name on the center's door. Newer centers may not appear — the city's public data ends in April 2023.</p>
     <div class="actions"><a class="btn btn-primary" href="search.html">Search again</a></div>
   </section>
 </main>
@@ -160,6 +178,7 @@
   var S = window.SproutScore;
   var id = S.getQueryParam("id");
   var teaser, TQ = [];
+  var REVEAL_KEY = "ss_reveal_" + id;
 
   function sevLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
   function statusLabel(st) {
@@ -168,32 +187,49 @@
     return "status not recorded";
   }
 
-  function render(t) {
+  function alreadyRevealed() {
+    try { return localStorage.getItem(REVEAL_KEY) === "1"; } catch (e) { return false; }
+  }
+  function markRevealed() {
+    try { localStorage.setItem(REVEAL_KEY, "1"); } catch (e) {}
+  }
+
+  // pre-capture: name + address only; counts masked in the DOM (◆ glyphs)
+  function renderHook(t) {
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("teaser").classList.remove("hidden");
     document.title = "SproutScore — " + t.name;
     document.getElementById("t-name").textContent = t.name;
     document.getElementById("t-addr").textContent = t.addr + ", " + t.boro + " " + t.zip;
-    document.getElementById("t-inspections").textContent = t.insp;
-    var fEl = document.getElementById("t-flagged");
+  }
+
+  // post-capture: reveal counts, standing, flags, tour questions
+  function reveal(t, scroll) {
+    document.getElementById("r-inspections").textContent = t.insp;
+    var fEl = document.getElementById("r-flagged");
     fEl.textContent = t.flag;
     fEl.className = "num " + (t.flag === 0 ? "ok" : (t.standing === "worse" ? "crit" : "warn"));
     var badge = "📊";
     var line = t.standing_display || "About average for NYC";
     if (t.standing === "better") badge = "✅";
     if (t.standing === "worse") badge = "⚠️";
-    document.getElementById("t-badge").textContent = badge;
-    document.getElementById("t-standing-line").textContent = line;
-    document.getElementById("t-standing-detail").textContent = t.standing_detail;
-    document.getElementById("t-last").textContent = S.fmtDate(t.last);
-    document.getElementById("t-asof").textContent = "Apr 24, 2023";
+    document.getElementById("r-badge").textContent = badge;
+    document.getElementById("r-standing-line").textContent = line;
+    document.getElementById("r-standing-detail").textContent = t.standing_detail;
+    document.getElementById("r-last").textContent = S.fmtDate(t.last);
+
+    var ld = document.getElementById("r-lowdata");
+    if (t.insp < 3) {
+      ld.textContent = "Only " + t.insp + " inspection(s) on record — too few to judge a pattern. Treat this as a starting point, not a verdict.";
+      ld.classList.remove("hidden");
+    }
 
     var flagsSec = document.getElementById("flags-sec");
     var cleanSec = document.getElementById("clean-sec");
     var flags = t.flagged || [];
     if (flags.length) {
       flagsSec.classList.remove("hidden");
-      var ul = document.getElementById("t-flags");
+      var ul = document.getElementById("r-flags");
       ul.innerHTML = "";
       flags.slice(0, 8).forEach(function (f) {
         // f = [code, date, severity, status]
@@ -211,9 +247,25 @@
       cleanSec.classList.remove("hidden");
       document.getElementById("ba-raw").textContent = "NO VIOLATIONS ON RECORD\n(last inspection " + t.last + ")";
     }
+
+    var list = document.getElementById("r-tq-list");
+    list.innerHTML = "";
+    TQ.forEach(function (q, i) {
+      var d = document.createElement("div");
+      d.className = "tour-q";
+      d.innerHTML = '<span class="qn">Q' + (i + 1) + "</span>" + S.esc(q);
+      list.appendChild(d);
+    });
+
+    document.getElementById("hook-sec").classList.add("hidden");
+    document.getElementById("capture-sec").classList.add("hidden");
+    var fr = document.getElementById("free-result");
+    fr.classList.remove("hidden");
+    markRevealed();
+    if (scroll) fr.scrollIntoView();
   }
 
-  // tour questions (free): derived client-side from the teaser flags
+  // tour questions (free): derived in memory from the teaser flags; shown only after reveal
   function buildTourQuestions(t) {
     var qs = [];
     var flags = t.flagged || [];
@@ -231,20 +283,7 @@
     return qs.slice(0, 3);
   }
 
-  function showTourQuestions() {
-    var box = document.getElementById("tour-questions");
-    var list = document.getElementById("tq-list");
-    list.innerHTML = "";
-    TQ.forEach(function (q, i) {
-      var d = document.createElement("div");
-      d.className = "tour-q";
-      d.innerHTML = '<span class="qn">Q' + (i + 1) + "</span>" + S.esc(q);
-      list.appendChild(d);
-    });
-    box.classList.remove("hidden");
-  }
-
-  // ── email capture ──
+  // ── email capture: the gate to the free result ──
   document.getElementById("capture-form").addEventListener("submit", async function (e) {
     e.preventDefault();
     var email = document.getElementById("c-email").value.trim();
@@ -254,7 +293,7 @@
       S.setStatus(status, "That email doesn't look right.", "err"); return;
     }
     btn.disabled = true;
-    S.setStatus(status, "Sending your free result…", "busy");
+    S.setStatus(status, "Revealing your free result…", "busy");
     try {
       var res = await fetch("/api/subscribe", {
         method: "POST", headers: { "content-type": "application/json" },
@@ -262,9 +301,9 @@
       });
       var data = await res.json().catch(function () { return null; });
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "subscribe_failed");
-      S.setStatus(status, "✓ Done — your free result + 3 tour questions are on their way to " + email + ".", "ok");
+      S.setStatus(status, "✓ Revealed — your free result + 3 tour questions are also on their way to " + email + ".", "ok");
       document.getElementById("c-email").value = "";
-      showTourQuestions();
+      reveal(teaser, true);
     } catch (err) {
       S.setStatus(status, "Couldn't save that — please try again in a moment.", "err");
     } finally { btn.disabled = false; }
@@ -311,7 +350,8 @@
           return;
         }
         TQ = buildTourQuestions(teaser);
-        render(teaser);
+        renderHook(teaser);
+        if (alreadyRevealed()) reveal(teaser, false);
       })
       .catch(function () {
         document.getElementById("loading").classList.add("hidden");
