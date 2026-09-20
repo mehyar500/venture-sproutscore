@@ -1,0 +1,4 @@
+# Cloudflare Pages _headers — the SW script itself must never be HTTP-cached,
+# or the browser's update check keeps seeing the old worker forever.
+/sw.js
+  Cache-Control: no-cache

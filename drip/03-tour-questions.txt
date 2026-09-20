@@ -1,0 +1,35 @@
+Subject: 3 questions that change a daycare tour
+Preheader: Directors answer these differently when they know you've read the inspection file.
+From: SproutScore <team@mehyar.us>
+Unsubscribe: {{unsub_url}} (one click, honored immediately)
+
+Parents who've read the inspection file tour differently. Not
+confrontational — just specific. Directors notice, and they answer
+differently.
+
+Three questions that work at any center:
+
+1. "What is your staff-to-child ratio right now, in this room — and
+   how do you cover breaks without breaking ratio?"
+   (Ratios are the #1 thing inspectors cite. Watch whether the answer
+   is instant or vague.)
+
+2. "May I see your two most recent full inspection reports — not just
+   the summary?"
+   (Centers are used to this ask. Hesitation tells you plenty.)
+
+3. "What changed the day after your last flagged inspection?"
+   (Every center has a last inspection. This asks about follow-through,
+   not perfection.)
+
+For {{center_name}} specifically, the decoded report writes these
+questions FROM its actual record — naming the real citations and dates,
+so you're not asking generically.
+
+https://sproutscore.mehyar.us/center.html?id={{center_id}}
+
+— SproutScore 🌱
+
+---
+MehyarSoft LLC, 228 Park Ave S #92842, New York, NY 10003
+Don't want these? Unsubscribe in one click: {{unsub_url}}

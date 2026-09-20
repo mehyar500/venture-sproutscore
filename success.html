@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SproutScore — Payment confirmed</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1412">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html"><span class="mark">🌱</span>Sprout<span>Score</span></a>
+    <nav class="nav">
+      <a href="index.html#faq">FAQ</a>
+      <a href="mailto:team@mehyar.us">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="centered" id="state-paid" hidden>
+    <div class="check">✓</div>
+    <h1>Payment confirmed.</h1>
+    <p class="lede">Your decoded report is being prepared right now — usually ready within a minute. This page updates on its own; your private report link is also on its way to your email.</p>
+    <div class="spinner" id="gen-spinner"></div>
+    <p class="lede" id="gen-label">Reading the inspection file…</p>
+    <a class="btn btn-primary" id="report-btn" href="#" hidden>View my decoded report 🌱</a>
+  </section>
+
+  <section class="centered" id="state-unknown" hidden>
+    <h1>Looking for your order…</h1>
+    <p class="lede" id="unknown-label">Checking your payment status.</p>
+    <div class="spinner"></div>
+  </section>
+
+  <section id="token-section">
+    <h2>No token in this link?</h2>
+    <p class="lede">Your receipt email carries a private access token. Paste it here to jump to your order status.</p>
+    <form id="token-form" novalidate>
+      <div class="token-form">
+        <input type="text" id="token-input" placeholder="paste your token" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="submit" class="btn btn-primary">Check status</button>
+      </div>
+      <div class="status" id="token-status"></div>
+    </form>
+  </section>
+
+  <section id="state-failed" hidden>
+    <h2>Something went sideways</h2>
+    <p class="lede">Your payment went through, but report generation hit a snag. Nothing is lost — email <a href="mailto:team@mehyar.us">team@mehyar.us</a> with your token and we'll fix it free.</p>
+    <div class="disclaimer"><strong>Your token:</strong> <span id="failed-token" class="mono"></span></div>
+  </section>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>© 2026 SproutScore · sproutscore.mehyar.us</span>
+    <span><a href="index.html">Home</a> · <a href="search.html">Search free</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="unsubscribe.html">Unsubscribe</a> · <a href="mailto:team@mehyar.us">Contact</a></span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var S = window.SproutScore;
+  var token = S.getQueryParam("token");
+  var paidSec = document.getElementById("state-paid");
+  var unknownSec = document.getElementById("state-unknown");
+  var failedSec = document.getElementById("state-failed");
+  var genLabel = document.getElementById("gen-label");
+  var spinner = document.getElementById("gen-spinner");
+  var reportBtn = document.getElementById("report-btn");
+  var tokenForm = document.getElementById("token-form");
+  var tokenInput = document.getElementById("token-input");
+  var tokenStatus = document.getElementById("token-status");
+  var timer = null;
+  var attempts = 0;
+  var MAX_ATTEMPTS = 12; // ~60s of polling, then stop spinning and explain
+  var labels = ["Reading the inspection file…", "Translating inspector code…", "Rating each violation…", "Comparing to the NYC average…", "Writing your tour questions…"];
+  var labelIdx = 0;
+
+  tokenForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var t = tokenInput.value.trim();
+    if (t.length < 16) {
+      S.setStatus(tokenStatus, "That token looks too short — paste the full one from your email.", "err");
+      return;
+    }
+    window.location.search = "?token=" + encodeURIComponent(t);
+  });
+
+  if (!token) {
+    unknownSec.hidden = false;
+    document.getElementById("unknown-label").textContent =
+      "There's no order token in this link yet — it arrives right after checkout. Paste it above if you have it.";
+    return;
+  }
+  unknownSec.hidden = false;
+  poll();
+
+  async function poll() {
+    attempts += 1;
+    try {
+      var res = await fetch(S.PAY_STATUS_URL + "?token=" + encodeURIComponent(token), { cache: "no-store" });
+      var data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (res.status === 404 || (data && data.error === "unknown_token")) {
+        if (attempts >= MAX_ATTEMPTS) {
+          document.getElementById("unknown-label").textContent =
+            "We still can't find that order. If you paid, your receipt email has a private access token — paste it in the box below and check again.";
+          spinner.hidden = true;
+          return; // stop polling; the manual token box stays available
+        }
+        document.getElementById("unknown-label").textContent =
+          "We couldn't find that order yet — payments can take a minute to register. This page keeps checking.";
+        schedule();
+        return;
+      }
+      if (!res.ok || !data) throw new Error("status_failed");
+      unknownSec.hidden = true;
+      if (data.paid) {
+        paidSec.hidden = false;
+        spinner.hidden = true;
+        genLabel.textContent = "Your decoded report is ready 🌱";
+        reportBtn.hidden = false;
+        reportBtn.href = "report.html?token=" + encodeURIComponent(token);
+        stop();
+      } else if (data.status === "failed") {
+        paidSec.hidden = true;
+        failedSec.hidden = false;
+        document.getElementById("failed-token").textContent = token;
+        stop();
+      } else {
+        paidSec.hidden = false;
+        labelIdx = (labelIdx + 1) % labels.length;
+        genLabel.textContent = labels[labelIdx];
+        schedule();
+      }
+    } catch (e) {
+      if (attempts >= MAX_ATTEMPTS) {
+        document.getElementById("unknown-label").textContent =
+          "We can't reach the payment server right now — check your connection and try again, or paste your token from the receipt email in the box below.";
+        spinner.hidden = true;
+        return; // stop polling; the manual token box stays available
+      }
+      schedule(); // transient — keep polling
+    }
+  }
+
+  function schedule() { stop(); timer = setTimeout(poll, 5000); }
+  function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SproutScore — Search NYC daycares free</title>
+<meta name="description" content="Search any NYC daycare free — inspection counts, flagged violations, standing vs the NYC average.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1412">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html"><span class="mark">🌱</span>Sprout<span>Score</span></a>
+    <nav class="nav">
+      <a href="index.html#pricing">Pricing</a>
+      <a class="nav-secondary" href="index.html#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="eyebrow">Free search</p>
+    <h1>Find your daycare.</h1>
+    <p class="lede">Name, street, or ZIP — we'll pull its real NYC inspection record.</p>
+    <form class="search-box" id="search-form" role="search">
+      <input type="search" id="q" placeholder="e.g. Sunshine Corner, or 11215…" autocomplete="off" aria-label="Search NYC daycares">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    <div class="status" id="search-status" role="status"></div>
+  </section>
+
+  <section id="results-sec" class="hidden">
+    <p class="eyebrow" id="results-eyebrow">Results</p>
+    <h2 id="results-title">Matching centers</h2>
+    <ul class="results" id="results"></ul>
+  </section>
+
+  <section id="no-results" class="hidden centered">
+    <p class="eyebrow">No matches</p>
+    <h2>We couldn't find that one.</h2>
+    <p class="lede">Try the full name, a street, or just the ZIP. We cover licensed NYC daycares in the DOHMH dataset.</p>
+  </section>
+
+  <section id="hint-sec">
+    <div class="disclaimer">
+      <strong>Real NYC inspection records.</strong> Search covers 3,014 licensed NYC centers — data as of Apr 24, 2023 (the city has published no newer rows). Try "sunshine", "park slope", "11375", or "bronx".
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>© 2026 SproutScore · sproutscore.mehyar.us</span>
+    <span><a href="index.html">Home</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="unsubscribe.html">Unsubscribe</a> · <a href="mailto:team@mehyar.us">Contact</a></span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var S = window.SproutScore;
+  var form = document.getElementById("search-form");
+  var input = document.getElementById("q");
+  var status = document.getElementById("search-status");
+  var resultsSec = document.getElementById("results-sec");
+  var resultsList = document.getElementById("results");
+  var resultsTitle = document.getElementById("results-title");
+  var noResults = document.getElementById("no-results");
+  var hintSec = document.getElementById("hint-sec");
+  var DATA = null;
+
+  function flagLine(t) {
+    if (t.flag === 0) return '<span class="ok">✓ 0 flagged — clean record</span>';
+    var cls = t.standing === "worse" ? "bad" : "mid";
+    return '<span class="' + cls + '">' + t.flag + " flagged of " + t.insp + " inspections</span>";
+  }
+
+  function render(list) {
+    resultsList.innerHTML = "";
+    if (!list.length) {
+      resultsSec.classList.add("hidden");
+      noResults.classList.remove("hidden");
+      return;
+    }
+    noResults.classList.add("hidden");
+    resultsSec.classList.remove("hidden");
+    resultsTitle.textContent = list.length + (list.length === 1 ? " center found" : " centers found");
+    list.slice(0, 20).forEach(function (t) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = "center.html?id=" + encodeURIComponent(t.id);
+      a.innerHTML =
+        '<div class="rname">' + S.esc(t.name) + "</div>" +
+        '<div class="rmeta">' + S.esc(t.addr) + ", " + S.esc(t.boro) + " " + S.esc(t.zip) + "</div>" +
+        '<div class="rflags">' + flagLine(t) + "</div>";
+      li.appendChild(a);
+      resultsList.appendChild(li);
+    });
+    window.scrollTo({ top: resultsSec.offsetTop - 70, behavior: "smooth" });
+  }
+
+  function doSearch(q) {
+    q = (q || "").trim().toLowerCase();
+    if (q.length < 2) {
+      S.setStatus(status, "Type at least 2 characters to search.", "err");
+      return;
+    }
+    S.setStatus(status, "", "");
+    var list = (DATA.centers || []).filter(function (c) {
+      return c.name.toLowerCase().indexOf(q) > -1 ||
+        c.addr.toLowerCase().indexOf(q) > -1 ||
+        c.zip.indexOf(q) > -1 ||
+        c.boro.toLowerCase().indexOf(q) > -1;
+    });
+    render(list);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    doSearch(input.value);
+  });
+
+  fetch("assets/data/centers.json", { cache: "no-store" })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      DATA = j;
+      var q = S.getQueryParam("q");
+      if (q) { input.value = q; doSearch(q); }
+    })
+    .catch(function () {
+      S.setStatus(status, "Couldn't load the directory — check your connection and reload.", "err");
+    });
+})();
+</script>
+
+</body>
+</html>

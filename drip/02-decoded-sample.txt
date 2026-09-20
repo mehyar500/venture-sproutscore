@@ -1,0 +1,34 @@
+Subject: What "47.39(c)" actually means (decoded sample)
+Preheader: Inspector code, translated — this is what the $19 report does for every flag.
+From: SproutScore <team@mehyar.us>
+Unsubscribe: {{unsub_url}} (one click, honored immediately)
+
+Quick one.
+
+Inspection reports read like this:
+
+  VIOLATION 47.39(c) — "FAILURE TO MAINTAIN STAFF/CHILD RATIOS"
+
+Here's what our decoded report says instead:
+
+  Too many children per caregiver (CRITICAL)
+  What happened: the inspector counted more children under one
+  caregiver's supervision than the legal ratio allows.
+  Why it matters: when one adult is stretched across too many kids,
+  injuries and missed emergencies go up.
+  Fixed? Yes — corrected during the visit.
+
+That's the whole product: every flag on your center's record,
+translated like that. Severity rating, fixed-or-not, and the exact
+questions to ask on your tour.
+
+Your center's page, whenever you're ready:
+https://sproutscore.mehyar.us/center.html?id={{center_id}}
+
+One report is $19, one time. No subscription.
+
+— SproutScore 🌱
+
+---
+MehyarSoft LLC, 228 Park Ave S #92842, New York, NY 10003
+Don't want these? Unsubscribe in one click: {{unsub_url}}

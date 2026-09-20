@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SproutScore — Free daycare safety check</title>
+<meta name="description" content="Free NYC daycare safety check: inspection counts, flagged violations, standing vs the NYC average.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1412">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html"><span class="mark">🌱</span>Sprout<span>Score</span></a>
+    <nav class="nav">
+      <a href="search.html">← New search</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="loading">
+    <div class="spinner"></div>
+    <p class="lede">Pulling the inspection record…</p>
+  </section>
+
+  <div id="teaser" class="hidden">
+    <section class="hero" style="padding-bottom:0">
+      <p class="eyebrow">Your free safety check 🌱</p>
+      <h1 id="t-name">—</h1>
+      <p class="lede" id="t-addr">—</p>
+    </section>
+
+    <section>
+      <div class="stats">
+        <div class="stat"><div class="num" id="t-inspections">—</div><div class="lbl">inspections on record</div></div>
+        <div class="stat"><div class="num" id="t-flagged">—</div><div class="lbl">flagged inspections</div></div>
+      </div>
+      <div class="standing">
+        <div class="badge" id="t-badge">📊</div>
+        <p><strong id="t-standing-line">—</strong><br><span id="t-standing-detail" style="color:var(--muted)">—</span>
+        <span class="data-asof">Last inspection: <span id="t-last">—</span> · Data as of <span id="t-asof">—</span> · Source: NYC DOHMH — no newer rows published</span></p>
+      </div>
+    </section>
+
+    <section id="flags-sec" class="hidden">
+      <p class="eyebrow">Flagged inspections</p>
+      <h2>What the inspectors flagged</h2>
+      <p class="lede">The codes below are the raw record. The $19 report translates every one into plain English — what happened, how serious it is, and whether the city recorded a correction.</p>
+      <ul class="flags" id="t-flags"></ul>
+    </section>
+
+    <section id="clean-sec" class="hidden">
+      <div class="standing" style="border-color:var(--accent)">
+        <div class="badge">✅</div>
+        <p><strong>A clean record.</strong><br><span style="color:var(--muted)">No flagged inspections on file. The $19 report still verifies the details behind each visit — clean records are worth confirming, not assuming.</span></p>
+      </div>
+    </section>
+
+    <!-- email capture: the funnel entry -->
+    <section id="capture-sec">
+      <div class="form-card" style="border-color:var(--accent)">
+        <p class="eyebrow">Free result by email</p>
+        <h2 style="margin-top:0">Email me my free result + 3 tour questions</h2>
+        <p class="lede">We'll send this safety check to your inbox, plus 3 sharp questions tailored to this center's record to ask on your tour.</p>
+        <form id="capture-form" novalidate>
+          <div class="field">
+            <label for="c-email">Email address</label>
+            <input type="email" id="c-email" autocomplete="email" placeholder="you@example.com">
+            <p class="hint">Your result + 3 tour questions. Occasional SproutScore updates. <a href="unsubscribe.html">Unsubscribe anytime</a> in one click. See <a href="privacy.html">Privacy</a>.</p>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="capture-btn">Email me my free result 🌱</button>
+          <div class="status" id="capture-status" role="status"></div>
+        </form>
+      </div>
+      <div id="tour-questions" class="hidden">
+        <p class="eyebrow">Your 3 free tour questions</p>
+        <h2>Ask these on your tour.</h2>
+        <div id="tq-list"></div>
+      </div>
+    </section>
+
+    <!-- paywall: upgrade framing -->
+    <section id="paywall">
+      <p class="eyebrow">The full picture — $19</p>
+      <h2>You've seen the headline.<br>Here's the whole story.</h2>
+      <p class="lede">The free check tells you <em>that</em> something was flagged. The decoded report tells you <em>what it means for your child</em>.</p>
+      <div class="before-after">
+        <div class="ba-panel before">
+          <div class="ba-label">What you have now (free)</div>
+          <div class="raw-record" id="ba-raw">VIOLATION 47.39(c) — CORRECTED</div>
+        </div>
+        <div class="ba-panel after">
+          <div class="ba-label">What $19 unlocks</div>
+          <div class="violation sev-critical" style="margin-top:0">
+            <h3 style="font-size:15px">Too many children per caregiver <span class="sev-tag">Critical</span></h3>
+            <p class="q"><strong>What happened</strong> · <strong>why it matters for your child</strong> · <strong>did the city record a correction</strong> — for every flag, in plain English.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-card" style="margin-top:20px">
+        <div class="save">One-time · no subscription</div>
+        <h3>Full decoded report</h3>
+        <div class="price">$19 <small>one-time</small></div>
+        <ul class="includes">
+          <li>Every violation in plain English</li>
+          <li>Severity rating + correction status proof</li>
+          <li>Safety score with the math shown</li>
+          <li>Nearby centers compared side-by-side</li>
+          <li>Exact tour questions, printable cards</li>
+        </ul>
+        <div class="field" style="text-align:left">
+          <label for="p-email">Email for your receipt + report link</label>
+          <input type="email" id="p-email" autocomplete="email" placeholder="you@example.com">
+        </div>
+        <button class="btn btn-gold btn-block" id="buy-btn">Decode this center — $19</button>
+        <div class="status" id="pay-status" role="status"></div>
+        <p class="hero-proof" style="margin-top:12px">🔒 Secure Stripe checkout · Delivered instantly · <a href="terms.html">Terms</a></p>
+      </div>
+
+      <div class="price-card" style="margin-top:12px">
+        <div class="save">Touring 3 centers?</div>
+        <h3>3-report pack — $39</h3>
+        <p>Decode three daycares and compare them side by side. One purchase, three reports, no expiry.</p>
+        <button class="btn btn-ghost btn-block" id="buy-pack-btn">Get the 3-pack — $39</button>
+        <div class="status" id="pay-pack-status" role="status"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="disclaimer">
+        <strong>Real NYC records, frozen in time.</strong> This page shows the center's actual NYC DOHMH inspection history — but the city's data ends April 2023, and no newer rows have been published. <strong>Not childcare advice:</strong> always tour in person and verify with the NYC DOHMH.
+      </div>
+    </section>
+  </div>
+
+  <section id="not-found" class="hidden centered">
+    <p class="eyebrow">Not found</p>
+    <h2>That center isn't in our directory.</h2>
+    <p class="lede">It may be unlicensed, outside NYC, or listed under a different name.</p>
+    <div class="actions"><a class="btn btn-primary" href="search.html">Search again</a></div>
+  </section>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>© 2026 SproutScore · sproutscore.mehyar.us</span>
+    <span><a href="index.html">Home</a> · <a href="search.html">Search free</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="unsubscribe.html">Unsubscribe</a> · <a href="mailto:team@mehyar.us">Contact</a></span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var S = window.SproutScore;
+  var id = S.getQueryParam("id");
+  var teaser, TQ = [];
+
+  function sevLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function statusLabel(st) {
+    if (st === "CORRECTED") return "corrected";
+    if (st === "OPEN") return "open — no correction on record";
+    return "status not recorded";
+  }
+
+  function render(t) {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("teaser").classList.remove("hidden");
+    document.title = "SproutScore — " + t.name;
+    document.getElementById("t-name").textContent = t.name;
+    document.getElementById("t-addr").textContent = t.addr + ", " + t.boro + " " + t.zip;
+    document.getElementById("t-inspections").textContent = t.insp;
+    var fEl = document.getElementById("t-flagged");
+    fEl.textContent = t.flag;
+    fEl.className = "num " + (t.flag === 0 ? "ok" : (t.standing === "worse" ? "crit" : "warn"));
+    var badge = "📊";
+    var line = t.standing_display || "About average for NYC";
+    if (t.standing === "better") badge = "✅";
+    if (t.standing === "worse") badge = "⚠️";
+    document.getElementById("t-badge").textContent = badge;
+    document.getElementById("t-standing-line").textContent = line;
+    document.getElementById("t-standing-detail").textContent = t.standing_detail;
+    document.getElementById("t-last").textContent = S.fmtDate(t.last);
+    document.getElementById("t-asof").textContent = "Apr 24, 2023";
+
+    var flagsSec = document.getElementById("flags-sec");
+    var cleanSec = document.getElementById("clean-sec");
+    var flags = t.flagged || [];
+    if (flags.length) {
+      flagsSec.classList.remove("hidden");
+      var ul = document.getElementById("t-flags");
+      ul.innerHTML = "";
+      flags.slice(0, 8).forEach(function (f) {
+        // f = [code, date, severity, status]
+        var li = document.createElement("li");
+        li.className = "sev-" + f[2];
+        li.innerHTML = '<span class="code">' + S.esc(f[0]) + '</span><span class="sev-tag">' + sevLabel(f[2]) + "</span>" +
+          '<div class="flag-meta">Flagged ' + S.fmtDate(f[1]) + " · " + statusLabel(f[3]) + "</div>";
+        ul.appendChild(li);
+      });
+      var first = flags[0];
+      document.getElementById("ba-raw").textContent =
+        "VIOLATION " + first[0] + "\nDATE CITED: " + first[1] +
+        "\nSTATUS: " + first[3] + "\n(raw record — decoded in the $19 report)";
+    } else {
+      cleanSec.classList.remove("hidden");
+      document.getElementById("ba-raw").textContent = "NO VIOLATIONS ON RECORD\n(last inspection " + t.last + ")";
+    }
+  }
+
+  // tour questions (free): derived client-side from the teaser flags
+  function buildTourQuestions(t) {
+    var qs = [];
+    var flags = t.flagged || [];
+    flags.forEach(function (f) {
+      if (f[2] === "critical" && qs.length < 2) {
+        qs.push('You were cited under code ' + f[0] + " on " + S.fmtDate(f[1]) + ". Walk me through exactly what changed the day after the inspector left.");
+      }
+    });
+    flags.forEach(function (f) {
+      if (f[3] === "OPEN" && qs.length < 3) {
+        qs.push("The " + S.fmtDate(f[1]) + " citation (" + f[0] + ") is still listed as open with no correction on record. Can I see the corrective-action paperwork?");
+      }
+    });
+    qs.push("What is your staff-to-child ratio right now, in this room — and how do you cover breaks without breaking ratio?");
+    return qs.slice(0, 3);
+  }
+
+  function showTourQuestions() {
+    var box = document.getElementById("tour-questions");
+    var list = document.getElementById("tq-list");
+    list.innerHTML = "";
+    TQ.forEach(function (q, i) {
+      var d = document.createElement("div");
+      d.className = "tour-q";
+      d.innerHTML = '<span class="qn">Q' + (i + 1) + "</span>" + S.esc(q);
+      list.appendChild(d);
+    });
+    box.classList.remove("hidden");
+  }
+
+  // ── email capture ──
+  document.getElementById("capture-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var email = document.getElementById("c-email").value.trim();
+    var status = document.getElementById("capture-status");
+    var btn = document.getElementById("capture-btn");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      S.setStatus(status, "That email doesn't look right.", "err"); return;
+    }
+    btn.disabled = true;
+    S.setStatus(status, "Sending your free result…", "busy");
+    try {
+      var res = await fetch("/api/subscribe", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email, source: "teaser", center_id: teaser.id, center_name: teaser.name }),
+      });
+      var data = await res.json().catch(function () { return null; });
+      if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "subscribe_failed");
+      S.setStatus(status, "✓ Done — your free result + 3 tour questions are on their way to " + email + ".", "ok");
+      document.getElementById("c-email").value = "";
+      showTourQuestions();
+    } catch (err) {
+      S.setStatus(status, "Couldn't save that — please try again in a moment.", "err");
+    } finally { btn.disabled = false; }
+  });
+
+  // ── checkout ──
+  async function buy(product_id, emailInputId, statusId, btn) {
+    var email = document.getElementById(emailInputId).value.trim();
+    var status = document.getElementById(statusId);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      S.setStatus(status, "Enter your email first — your receipt and report link go there.", "err"); return;
+    }
+    btn.disabled = true;
+    S.setStatus(status, "Opening secure checkout…", "busy");
+    try {
+      var data = await S.startCheckout({
+        product_id: product_id, email: email,
+        center_id: teaser.id, center_name: teaser.name, test: true,
+      });
+      window.location.href = data.checkout_url;
+    } catch (err) {
+      S.setStatus(status, "Checkout didn't start (" + S.esc(err.message) + ") — try again in a moment.", "err");
+      btn.disabled = false;
+    }
+  }
+  document.getElementById("buy-btn").addEventListener("click", function () {
+    buy(S.PRODUCT_REPORT, "p-email", "pay-status", this);
+  });
+  document.getElementById("buy-pack-btn").addEventListener("click", function () {
+    buy(S.PRODUCT_3PACK, "p-email", "pay-pack-status", this);
+  });
+
+  if (!id) {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("not-found").classList.remove("hidden");
+  } else {
+    fetch("assets/data/centers.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        teaser = (j.centers || []).find(function (c) { return c.id === id; });
+        if (!teaser) {
+          document.getElementById("loading").classList.add("hidden");
+          document.getElementById("not-found").classList.remove("hidden");
+          return;
+        }
+        TQ = buildTourQuestions(teaser);
+        render(teaser);
+      })
+      .catch(function () {
+        document.getElementById("loading").classList.add("hidden");
+        document.getElementById("not-found").classList.remove("hidden");
+      });
+  }
+})();
+</script>
+
+</body>
+</html>

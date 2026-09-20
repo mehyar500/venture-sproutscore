@@ -1,0 +1,35 @@
+Subject: Your free SproutScore check for {{center_name}}
+Preheader: 3 flagged inspections — here's what those flags actually are.
+From: SproutScore <team@mehyar.us>
+Unsubscribe: {{unsub_url}} (one click, honored immediately)
+
+Hi there,
+
+Here's your free SproutScore safety check for {{center_name}}:
+
+  Inspections on record: {{inspections}}
+  Flagged: {{flagged}}
+  Standing: {{standing_line}}
+  Last inspection: {{last_inspection}}
+  Data as of {{data_as_of}} (NYC DOHMH)
+
+What the flags mean, in one line each:
+
+{{flag_lines}}
+
+A "flagged inspection" is just the raw record. What matters is what was
+actually found, how serious it is, and whether it was fixed — that's what
+the $19 decoded report translates for you, flag by flag, in plain English.
+
+See your center again any time:
+https://sproutscore.mehyar.us/center.html?id={{center_id}}
+
+— SproutScore 🌱
+
+P.S. Your 3 free tour questions are below — ask them on your visit.
+
+{{tour_questions}}
+
+---
+MehyarSoft LLC, 228 Park Ave S #92842, New York, NY 10003
+Don't want these? Unsubscribe in one click: {{unsub_url}}

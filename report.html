@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SproutScore — Your decoded report</title>
+<meta name="description" content="Your SproutScore decoded daycare inspection report.">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1412">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header no-print">
+  <div class="inner">
+    <a class="brand" href="index.html"><span class="mark">🌱</span>Sprout<span>Score</span></a>
+    <nav class="nav">
+      <a href="search.html">New search</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="centered" id="loading">
+    <div class="spinner"></div>
+    <p class="lede">Decoding the inspection record…</p>
+  </section>
+
+  <section class="centered hidden" id="denied">
+    <p class="eyebrow">Private report</p>
+    <h2>We couldn't open that report.</h2>
+    <p class="lede">The link is missing or expired. Your receipt email has the correct private link.</p>
+    <div class="actions"><a class="btn btn-primary" href="search.html">Search daycares</a></div>
+  </section>
+
+  <div id="report" class="hidden">
+    <div class="sample-banner hidden" id="demo-banner">SAMPLE REPORT — for preview only. This decodes a real NYC center's inspection record. The $19 report decodes your center's full history.</div>
+
+    <section class="hero" style="padding-bottom:0">
+      <p class="eyebrow">Decoded inspection report 🌱</p>
+      <h1 id="r-name">—</h1>
+      <p class="lede" id="r-addr">—</p>
+      <p class="hero-proof">Inspections on record: <strong id="r-inspections">—</strong> · Last inspection <strong id="r-last">—</strong> · Data as of <strong id="r-asof">—</strong> · Source: NYC DOHMH</p>
+      <p class="lede" style="font-size:13px">City inspection data ends April 2023 — the city has published no newer rows. Treat "open" violations as no correction recorded by then, not as proof the problem continues.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Safety score</p>
+      <div class="score-wrap">
+        <div class="score-ring" role="img" aria-label="Safety score">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
+            <circle id="score-arc" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div class="score-num"><b id="score-num">–</b><span id="score-band">–</span></div>
+        </div>
+        <p class="score-explain" id="score-explain">—</p>
+      </div>
+      <div class="stats" id="sev-stats"></div>
+      <details class="faq" style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:700">How the score is calculated</summary>
+        <p style="color:var(--muted);font-size:14px" id="score-math"></p>
+      </details>
+    </section>
+
+    <section>
+      <p class="eyebrow">Every violation, decoded</p>
+      <h2>What the inspectors actually found.</h2>
+      <p class="lede">Each flag below is translated from inspector code into plain English: what happened, why it matters for your child, and whether the city recorded a correction.</p>
+      <div id="violations"></div>
+      <div id="no-violations" class="hidden">
+        <div class="standing" style="border-color:var(--accent)">
+          <div class="badge">✅</div>
+          <p><strong>No flagged violations on record.</strong><br><span style="color:var(--muted)">Every inspection on file came back clean. Keep the tour questions below anyway — good centers welcome them.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Context</p>
+      <h2>How it compares.</h2>
+      <div class="share-card">
+        <div class="sc-name" id="c-name">—</div>
+        <div class="sc-row"><span>Flagged inspections</span><b id="c-flagged">—</b></div>
+        <div class="sc-row"><span>NYC violation-rate average</span><b id="c-avg">—</b></div>
+        <div class="sc-row"><span>Safety score</span><b id="c-score">—</b></div>
+      </div>
+      <p class="lede" id="c-note" style="margin-top:12px"></p>
+      <div id="nearby"></div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Your tour script</p>
+      <h2>Exact questions for your visit.</h2>
+      <p class="lede">Written from this center's actual record — not generic advice.</p>
+      <div id="tour-list"></div>
+    </section>
+
+    <section class="no-print">
+      <div class="form-card" style="text-align:center">
+        <p class="eyebrow">Keep it</p>
+        <h2>Print or save as PDF</h2>
+        <p class="lede">Bring this report on your tour — or share it with your partner.</p>
+        <button class="btn btn-primary btn-block" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="disclaimer">
+        <strong>Not childcare advice.</strong> This report translates public NYC DOHMH inspection records into plain English. It is an information service — not a recommendation for or against any provider. Severity ratings reflect inspector classifications, not medical or legal judgments. Always tour in person and verify with the NYC DOHMH.
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="no-print">
+  <div class="inner">
+    <span>© 2026 SproutScore · sproutscore.mehyar.us</span>
+    <span><a href="index.html">Home</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="unsubscribe.html">Unsubscribe</a> · <a href="mailto:team@mehyar.us">Contact</a></span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var S = window.SproutScore;
+  var token = S.getQueryParam("token");
+  var demo = S.getQueryParam("demo") === "1";
+
+  function sevLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function bandColor(band) {
+    return band === "A" ? "var(--accent)" : band === "B" ? "#a3e635" :
+           band === "C" ? "var(--warn)" : band === "D" ? "#fb923c" : "var(--crit)";
+  }
+
+  function render(r) {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("report").classList.remove("hidden");
+    if (demo) document.getElementById("demo-banner").classList.remove("hidden");
+    var c = r.center;
+    document.title = "SproutScore — " + c.name;
+    document.getElementById("r-name").textContent = c.name;
+    document.getElementById("r-addr").textContent = c.address + ", " + c.borough + " " + c.zip +
+      (c.child_care_type ? " · " + c.child_care_type : "") + " · capacity " + (c.capacity || "—");
+    document.getElementById("r-inspections").textContent = c.inspections;
+    document.getElementById("r-last").textContent = S.fmtDate(c.last_inspection);
+    document.getElementById("r-asof").textContent = "Apr 24, 2023";
+
+    // score ring
+    var circ = 326.7;
+    var arc = document.getElementById("score-arc");
+    arc.style.strokeDashoffset = String(circ * (1 - r.score / 100));
+    arc.setAttribute("stroke", bandColor(r.band));
+    document.getElementById("score-num").textContent = r.score;
+    document.getElementById("score-band").textContent = "Grade " + r.band;
+    document.getElementById("score-explain").textContent = r.score_explained;
+
+    var stats = document.getElementById("sev-stats");
+    stats.innerHTML = "";
+    [["critical", "var(--crit)"], ["major", "var(--warn)"], ["minor", "var(--minor)"]].forEach(function (p) {
+      var d = document.createElement("div");
+      d.className = "stat";
+      d.innerHTML = '<div class="num" style="color:' + p[1] + '">' + (r.severity_summary[p[0]] || 0) + '</div><div class="lbl">' + p[0] + "</div>";
+      stats.appendChild(d);
+    });
+    document.getElementById("score-math").textContent =
+      "Start at 100. " + r.score_lines.map(function (l) {
+        return l.code + " (" + l.severity + "): −" + l.deduction + (l.restored ? ", +" + l.restored + " restored (corrected)" : l.status === "OPEN" ? " (open — no correction on record)" : "") + " = −" + l.net;
+      }).join("; ") + ". Final: " + r.score + " → Grade " + r.band + ".";
+
+    // violations
+    var vw = document.getElementById("violations");
+    vw.innerHTML = "";
+    if (!r.violations.length) {
+      document.getElementById("no-violations").classList.remove("hidden");
+    }
+    r.violations.forEach(function (v, i) {
+      var d = document.createElement("div");
+      d.className = "violation sev-" + v.severity;
+      var pill = v.status === "CORRECTED"
+        ? '<span class="status-pill CORRECTED">✓ Corrected</span>'
+        : v.status === "OPEN"
+          ? '<span class="status-pill OPEN">● Open — no correction on record</span>'
+          : '<span class="status-pill NA">○ Status not recorded</span>';
+      var citationLine = v.inspection
+        ? "Inspector's citation (" + S.esc(v.inspection) + ", " + S.fmtDate(v.date) + "):"
+        : "Inspector's citation (" + S.fmtDate(v.date) + "):";
+      d.innerHTML =
+        '<span class="vcode">Flag ' + (i + 1) + " · Code " + S.esc(v.code) + " · " + S.fmtDate(v.date) + ' <span class="sev-tag">' + sevLabel(v.severity) + "</span></span>" +
+        "<p><strong>What happened:</strong> " + S.esc(v.what_happened) + "</p>" +
+        '<p class="q"><strong>Correction record:</strong> ' + S.esc(v.status_plain) + "</p>" +
+        '<p class="q"><strong>Ask on your tour:</strong> ' + S.esc(v.tour_question) + "</p>" +
+        '<p class="q" style="color:var(--muted)"><strong>' + citationLine + '</strong> "' + S.esc(v.city_text) + '"</p>' +
+        pill;
+      vw.appendChild(d);
+    });
+
+    // comparison
+    var nyc = r.comparison.vs_nyc_avg;
+    var near = r.comparison.vs_nearby;
+    document.getElementById("c-name").textContent = c.name;
+    document.getElementById("c-flagged").textContent = c.flagged + " of " + c.inspections + " (" + nyc.center_violation_rate_pct + "%)";
+    document.getElementById("c-avg").textContent = nyc.nyc_avg_pct + "% (" + (nyc.cohort || "NYC") + ")";
+    document.getElementById("c-score").textContent = r.score + " (" + r.band + ")";
+    document.getElementById("c-note").textContent = nyc.plain;
+    var nb = document.getElementById("nearby");
+    nb.innerHTML = "";
+    var h = document.createElement("h3");
+    h.textContent = "Nearby: " + near.scope;
+    h.style.marginTop = "18px";
+    nb.appendChild(h);
+    var np = document.createElement("p");
+    np.className = "lede";
+    np.textContent = near.plain;
+    nb.appendChild(np);
+
+    // tour questions
+    var tq = document.getElementById("tour-list");
+    tq.innerHTML = "";
+    r.tour_questions.forEach(function (q, i) {
+      var d = document.createElement("div");
+      d.className = "tour-q";
+      d.innerHTML = '<span class="qn">Q' + (i + 1) + "</span>" + S.esc(q);
+      tq.appendChild(d);
+    });
+  }
+
+  function denied() {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("denied").classList.remove("hidden");
+  }
+
+  if (demo) {
+    fetch("/api/report?demo=1", { cache: "no-store" })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) { (data && data.ok) ? render(data.report) : denied(); })
+      .catch(denied);
+  } else if (token && token.length >= 16) {
+    fetch("/api/report?token=" + encodeURIComponent(token), { cache: "no-store" })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) { (data && data.ok) ? render(data.report) : denied(); })
+      .catch(denied);
+  } else {
+    denied();
+  }
+})();
+</script>
+
+</body>
+</html>

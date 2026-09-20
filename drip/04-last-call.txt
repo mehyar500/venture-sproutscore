@@ -1,0 +1,35 @@
+Subject: Still deciding on {{center_name}}?
+Preheader: The free check was the headline — the $19 report is the whole story.
+From: SproutScore <team@mehyar.us>
+Unsubscribe: {{unsub_url}} (one click, honored immediately)
+
+Last note on this one, then I'll leave you to it.
+
+Your free check told you {{center_name}} has {{flagged}} flagged
+inspection(s). What it didn't tell you:
+
+- WHAT was actually found (in plain English, not inspector code)
+- HOW SERIOUS each finding is — critical vs. minor matters enormously
+- WHETHER it was actually fixed, and how
+- HOW the center compares to the NYC average and nearby centers
+- The EXACT questions to ask on your tour, written from its record
+
+That's the $19 decoded report. One time, no subscription, printable
+for your tour.
+
+https://sproutscore.mehyar.us/center.html?id={{center_id}}
+
+Touring more than one center? The $39 3-pack decodes three, side by
+side — most parents compare at least two.
+
+Either way: tour in person, ask the hard questions, trust your gut.
+The report just makes sure you walk in informed.
+
+— SproutScore 🌱
+
+P.S. If you've already toured and chosen, reply and tell me how it
+went — I read everything.
+
+---
+MehyarSoft LLC, 228 Park Ave S #92842, New York, NY 10003
+Don't want these? Unsubscribe in one click: {{unsub_url}}
