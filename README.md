@@ -6,7 +6,7 @@ Free-first PWA: search any NYC daycare free, see inspections/flagged counts,
 standing vs the NYC average, and raw flagged codes. The $19 one-time report
 decodes every violation into plain English (what happened, severity, fixed or
 not) with a transparent safety score, comparisons, tour questions, and a
-printable tour card. The $39 3-pack decodes three centers.
+printable tour card. The $29 3-pack decodes three centers.
 
 ## Structure
 
@@ -14,7 +14,7 @@ printable tour card. The $39 3-pack decodes three centers.
 |---|---|
 | `index.html` | Landing — free-first hero search, free-vs-paid, decoded sample, pricing, FAQ |
 | `search.html` | Free search over the bundled teaser JSON |
-| `center.html` | Free teaser + email capture + $19/$39 paywall |
+| `center.html` | Free teaser + email capture + $19/$29 paywall |
 | `report.html` | Token-gated paid report (`?demo=1` = watermarked sample) |
 | `success.html` | Polls payment status, links to token-gated report |
 | `privacy.html` `terms.html` `unsubscribe.html` | Legal + one-click unsubscribe |
