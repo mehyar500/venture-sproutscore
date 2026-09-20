@@ -55,7 +55,7 @@ VALUES
    'Every violation in a NYC daycare inspection record, decoded into plain English.',
    'https://sproutscore.mehyar.us/success.html?token={access_token}',
    'https://sproutscore.mehyar.us/', 'sproutscore.mehyar.us', 1, NULL),
-  ('sproutscore-3pack', 'SproutScore 3-Report Pack', 'sproutscore', 3900, 'usd', 'sproutscore',
+  ('sproutscore-3pack', 'SproutScore 3-Report Pack', 'sproutscore', 2900, 'usd', 'sproutscore',
    'Three decoded daycare inspection reports — compare centers side by side.',
    'https://sproutscore.mehyar.us/success.html?token={access_token}',
    'https://sproutscore.mehyar.us/', 'sproutscore.mehyar.us', 1, NULL)

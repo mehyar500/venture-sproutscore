@@ -6,7 +6,7 @@ const PAY_STATUS_URL = "https://mehyar.us/api/pay/status";
 const PRODUCT_REPORT = "sproutscore-report";
 const PRODUCT_3PACK = "sproutscore-3pack";
 const PRICE_REPORT = 19;
-const PRICE_3PACK = 39;
+const PRICE_3PACK = 29;
 // Prices are display mirrors of the billing_products rows (sibling worker
 // registers the SKUs; the webhook charges only what D1 says).
 

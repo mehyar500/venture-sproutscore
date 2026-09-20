@@ -310,7 +310,25 @@
   });
 
   // ── checkout ──
+  // PAYMENTS GATE: the Stripe fulfillment webhook (fulfillSproutscore.js on
+  // mehyar-web) is NOT deployed yet, so the site must not take live payments.
+  // While PAYMENTS_LIVE is false the buy buttons carry the launch message
+  // and buy() never calls checkout. Flip to true ONLY after the webhook
+  // ships — the live buttons + checkout flow restore automatically.
+  var PAYMENTS_LIVE = false;
+  var GATE_LABEL = "Reports open at launch — get the free result below";
+  if (!PAYMENTS_LIVE) {
+    var b1 = document.getElementById("buy-btn");
+    var b2 = document.getElementById("buy-pack-btn");
+    if (b1) b1.textContent = GATE_LABEL;
+    if (b2) b2.textContent = GATE_LABEL;
+  }
   async function buy(product_id, emailInputId, statusId, btn) {
+    var status = document.getElementById(statusId);
+    if (!PAYMENTS_LIVE) {
+      S.setStatus(status, GATE_LABEL, "busy");
+      return;
+    }
     var email = document.getElementById(emailInputId).value.trim();
     var status = document.getElementById(statusId);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
