@@ -2,6 +2,7 @@
   "name": "sproutscore-pwa",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "app.js",
   "directories": {
     "doc": "docs"

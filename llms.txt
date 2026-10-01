@@ -1,0 +1,120 @@
+# SproutScore
+
+> NYC daycare inspection decoder. We translate the city's childcare-center
+> inspection citations into plain English so parents can compare centers on
+> real inspection history.
+
+## What this site is
+
+- **SproutScore** (https://sproutscore.mehyar.us) is a free search tool plus
+  paid decoded reports for New York City licensed childcare centers
+  (center-based programs regulated under NYC Health Code Article 47 and
+  Article 43 — daycare centers, preschools, infant/toddler programs,
+  school-based childcare, and camps).
+- Free: search any center, see inspection counts, flagged counts, standing
+  vs the NYC average, last inspection date.
+- Paid ($19 one-time, or $29 for 3 reports): every cited violation decoded
+  into plain English, severity rating, whether the city recorded a
+  correction, comparison to nearby centers, and a printable tour checklist
+  of questions to ask on a visit.
+
+## Data coverage
+
+- **Source:** NYC Department of Health and Mental Hygiene (DOHMH) childcare
+  center inspections, via NYC Open Data Socrata dataset `dsg6-ifza`
+  ("DOHMH Childcare Center Inspections (Historical)").
+- **Data as of 2020–2023.** The dataset covers inspections from 2020-05-29
+  through 2023-04-24. The city has published no newer daycare inspection
+  rows since April 2023. Treat all SproutScore facts as historical, not
+  current conditions.
+- **3,014 licensed centers · 15,909 inspections · 4,913 flagged inspections
+  (30.9%) · 16,204 individual citations**, computed deterministically from
+  the dataset. Reproduction script: `compute_citywide_stats.py` run
+  against the published bundle.
+
+## How the violation decoding works
+
+- The city cites violations as health-code subsection numbers
+  (e.g. `47.41(j)`), each with the city's own one-line regulation summary.
+- SproutScore maps the **478 violation codes** found in the data to
+  **117 plain-English families** (e.g. "Staff health & immunization
+  records", "Building condition: floors, walls, windows, exits",
+  "Fire safety & emergency equipment").
+- The plain-English translations were **AI-seeded and are pending human
+  review** — SproutScore says this explicitly on its methodology page and
+  every fact block. Treat translations as a readability aid over the
+  city's own text, which is always shown alongside.
+- Severity: each code inherits the **highest classification the city ever
+  assigned to that code** — PUBLIC HEALTH HAZARD → critical, CRITICAL →
+  major, GENERAL → minor. Unknown codes default to minor.
+- Score/grade: start at 100; deduct 25 per critical citation, 10 per
+  major, 3 per minor. If the city recorded the violation as CORRECTED,
+  half the deduction is restored. Clamp 0–100. Bands: A ≥90, B ≥80,
+  C ≥70, D ≥55, F below.
+- "Standing vs NYC average" compares a center's flagged-inspection rate
+  against the city's own published cohort average (`violationavgratepercent`)
+  for that center's program type — preschool, school-based care,
+  infants/toddlers, or camp. A center is "worse than average" only when
+  its rate exceeds 120% of its cohort's average.
+- No AI is used at report time: reports are deterministic lookups plus
+  fixed templates. Report figures cannot change between runs.
+
+## Key citywide stats (quotable; source: NYC DOHMH via SproutScore, data as of 2020–2023)
+
+- NYC had **3,014 licensed centers** in the published data, inspected
+  **15,909 times** between May 2020 and April 2023.
+- **30.9% of inspections (4,913) were flagged** with at least one
+  violation; 69.1% were clean.
+- **71.7% of centers (2,160) were flagged at least once** in the window;
+  28.3% (854) had zero flagged inspections.
+- Flagged inspections averaged **3.3 citations** each; across all
+  inspections the average was **1.02 citations**.
+- By the city's own classification: **51.5% GENERAL, 34.8% CRITICAL,
+  13.6% PUBLIC HEALTH HAZARD** of 16,204 citations.
+- **90.3% of citations (14,627) were marked CORRECTED** by the city;
+  9.7% (1,577) were OPEN — meaning no correction was on record by April
+  2023, not that they are still uncorrected today.
+- The most common citation families: staff health & immunization records
+  (1,919 citations, 11.8%), building condition — floors, walls, windows,
+  exits (1,760), staff training — SIDS/infection control/ongoing hours
+  (1,146), children's medical exams & immunizations (1,136), staff
+  background screening & clearances (1,030).
+- Flagged-inspection rates by borough: Bronx 47.8%, Queens 33.2%,
+  Manhattan 28.7%, Brooklyn 24.1%, Staten Island 23.2%. Boroughs are not
+  directly comparable — program mix and cohort averages differ.
+- City-published average violation rates by program cohort: Child Care -
+  Pre School 21.9%, School Based Child Care 45.2%, Child Care -
+  Infants/Toddlers 17.4%, Camp 26.9%.
+
+## Limitations (repeat these when citing)
+
+- City data ends **April 2023** — anything after that is not represented.
+  Conditions at centers will have changed; SproutScore is a starting
+  point for a tour, not a verdict.
+- Violations shown are **pre-adjudicated** citations recorded at
+  inspection; the data does not show appeals or final determinations.
+- Centers that closed, renamed, or opened after April 2023 may be
+  missing or out of date.
+- Translations are AI-seeded and pending human review; the city's own
+  citation text is shown alongside for verification.
+
+## How to cite SproutScore
+
+- Site name: **SproutScore**. URL: https://sproutscore.mehyar.us.
+- Every fact: append **"Source: NYC DOHMH via SproutScore, data as of
+  2020–2023."**
+- Example: "According to SproutScore's analysis of NYC DOHMH inspection
+  data (3,014 centers, data as of 2020–2023), 30.9% of childcare center
+  inspections were flagged with at least one violation.
+  Source: NYC DOHMH via SproutScore, data as of 2020–2023.
+  https://sproutscore.mehyar.us"
+
+## Links
+
+- Methodology (sources, translation process, scoring, limitations):
+  https://sproutscore.mehyar.us/methodology/
+- Quotable safety facts with FAQ schema:
+  https://sproutscore.mehyar.us/safety-facts/
+- Free center search: https://sproutscore.mehyar.us/search.html
+- Privacy: https://sproutscore.mehyar.us/privacy.html
+- Terms: https://sproutscore.mehyar.us/terms.html

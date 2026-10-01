@@ -146,7 +146,7 @@ p.lede { color: var(--muted); font-size: 17px; margin: 0 0 18px; }
   border-radius: 10px; padding: 12px 14px; font-size: 14px;
 }
 .flags li.sev-critical { border-left-color: var(--crit); }
-.flags li.sev-serious { border-left-color: var(--serious); }
+.flags li.sev-major { border-left-color: var(--serious); }
 .flags li.sev-minor { border-left-color: var(--minor); }
 .flags .code { font-weight: 800; font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
 .flags .sev-tag {
@@ -154,7 +154,7 @@ p.lede { color: var(--muted); font-size: 17px; margin: 0 0 18px; }
   padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: 1px;
 }
 .sev-critical .sev-tag { background: rgba(251,113,133,.15); color: var(--crit); }
-.sev-serious .sev-tag { background: rgba(251,191,36,.15); color: var(--serious); }
+.sev-major .sev-tag { background: rgba(251,191,36,.15); color: var(--serious); }
 .sev-minor .sev-tag { background: rgba(125,211,252,.15); color: var(--minor); }
 .flags .flag-meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
 
@@ -176,7 +176,8 @@ p.lede { color: var(--muted); font-size: 17px; margin: 0 0 18px; }
   border-radius: var(--radius); padding: 18px; margin-top: 14px;
 }
 .violation.sev-critical { border-left-color: var(--crit); }
-.violation.sev-serious { border-left-color: var(--serious); }
+.violation.sev-major { border-left-color: var(--serious); }
+.violation.sev-minor { border-left-color: var(--minor); }
 .violation h3 { font-size: 17px; margin: 2px 0 8px; }
 .violation .vcode { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); }
 .violation p { font-size: 15px; margin: 8px 0; }
@@ -258,8 +259,6 @@ p.lede { color: var(--muted); font-size: 17px; margin: 0 0 18px; }
 .results .rname { font-weight: 800; font-size: 17px; }
 .results .rmeta { color: var(--muted); font-size: 13px; margin-top: 2px; }
 .results .rflags { margin-top: 8px; font-size: 14px; }
-.rflags .ok { color: var(--ok); font-weight: 700; }
-.rflags .bad { color: var(--crit); font-weight: 700; }
 .rflags .mid { color: var(--warn); font-weight: 700; }
 
 /* ---------- faq ---------- */
@@ -302,19 +301,37 @@ footer a:hover { color: var(--text); }
   .search-box { flex-direction: column; }
   .search-box input, .search-box .btn { width: 100%; }
 }
+/* visible keyboard focus — inputs already show an accent border on :focus */
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+}
+input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
 @media print {
   body { background: #fff; color: #111; }
   .site-header, footer, .no-print, .hero .actions { display: none !important; }
   main { max-width: 100%; padding: 0; }
   .violation, .standing, .stat, .tier, .tour-q, .share-card { break-inside: avoid; }
   .violation, .standing, .stat, .tour-q { background: #fff; border-color: #ccc; color: #111; }
-  .violation p, .violation .q, .standing p, .score-explain { color: #333; }
+  .violation p, .violation .q, .standing p, .score-explain,
+  .lede, .hero-proof, .flag-meta, .rmeta, .disclaimer,
+  .standing .data-asof, .price-card p { color: #444; }
+  .violation .vcode { color: #555; }
+  .violation .q strong, .disclaimer strong { color: #111; }
+  .score-num span { color: #555; }
   h1, h2, h3 { color: #111; }
   .eyebrow { color: #0a7a4e; }
   .sev-tag, .status-pill { border: 1px solid #999; }
+  .status-pill.CORRECTED { color: #0a7a4e; }
+  .status-pill.OPEN { color: #b91c1c; }
+  .status-pill.NA { color: #555; }
+  .share-card { background: #fff; border-color: #0a7a4e; }
+  .share-card .sc-name, .share-card .sc-row b { color: #111; }
+  .share-card .sc-row { color: #444; }
+  .sample-banner { background: #fff; color: #8a5a00; }
+  .stale-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
 /* Funnel: masked pre-capture counts + stale-data banner */
 .num.mask { color: var(--muted); letter-spacing: 6px; user-select: none; -webkit-user-select: none; }
 .stale-banner { background: #FFF8E1; border: 1px solid #E8C547; color: #5C4A00; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; margin-top: 14px; }
-.centered { text-align: center; }

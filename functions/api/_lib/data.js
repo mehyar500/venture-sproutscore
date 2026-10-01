@@ -86,7 +86,7 @@ function cohortAvg(meta, cohort) {
   const table = meta.cohort_avg_violation_rate_pct || {};
   if (cohort && table[cohort] != null) {
     const v = parseFloat(table[cohort]);
-    if (!isNaN(v)) return v;
+    if (!isNaN(v)) return Math.round(v * 10) / 10; // one decimal for display
   }
   const g = parseFloat(meta.global_flagged_rate_pct);
   return isNaN(g) ? 30.9 : g;
@@ -102,6 +102,12 @@ function standingDisplay(verdict) {
   if (verdict === "below_average") return "Better than the NYC average";
   if (verdict === "near_average") return "About the NYC average";
   return "Worse than the NYC average";
+}
+// lowercase sentence-phrase for "... — worse than the NYC average." (keeps NYC caps)
+function standingDetailPhrase(verdict) {
+  if (verdict === "below_average") return "better than the NYC average";
+  if (verdict === "near_average") return "about the NYC average";
+  return "worse than the NYC average";
 }
 
 function titleCase(s) {
@@ -119,7 +125,10 @@ async function teaserOf(c) {
   const b = await bundle();
   const meta = b.SPROUT_META;
   const avg = cohortAvg(meta, c.cohort);
-  const rate = parseFloat(c.rate) || 0;
+  // Center's own violation rate from our inspection counts — NOT the city's
+  // opaque per-row violationratepercent, which can read 0% for a center
+  // flagged in most of its inspections (e.g. NUESTROS NINOS: flag=11/17).
+  const rate = c.insp > 0 ? Math.round((100 * c.flag) / c.insp) : 0;
   const verdict = standingVerdict(rate, avg);
   const decoded = (c.viol || [])
     .map((v) => decodeViolation(v, b.SPROUT_CODES))
@@ -146,7 +155,7 @@ async function teaserOf(c) {
     standing_display: standingDisplay(verdict),
     standing_detail:
       `Flagged in ${c.flag} of ${c.insp} inspections (${rate}% violation rate) vs ` +
-      `${avg}% for ${c.cohort || "NYC"} — ${standingDisplay(verdict).toLowerCase()}.`,
+      `${avg}% for ${c.cohort || "NYC"} — ${standingDetailPhrase(verdict)}.`,
     last_inspection: c.last,
     data_as_of: meta.data_as_of,
     data_caveat: DATA_CAVEAT,
@@ -204,7 +213,8 @@ async function fullReport(c) {
     );
   const scoring = scoreViolations(decoded);
   const avg = cohortAvg(meta, c.cohort);
-  const rate = parseFloat(c.rate) || 0;
+  // Same self-computed violation rate as teaserOf — see note there.
+  const rate = c.insp > 0 ? Math.round((100 * c.flag) / c.insp) : 0;
   const verdict = standingVerdict(rate, avg);
 
   // nearby: same ZIP, ranked by violation rate (lower = better);
@@ -217,7 +227,8 @@ async function fullReport(c) {
   }
   const nearby = pool
     .filter((x) => x.id !== c.id)
-    .map((x) => ({ id: x.id, name: x.name, rate: parseFloat(x.rate) || 0, flagged: x.flag }))
+    // same self-computed rate as the center itself (see note above)
+    .map((x) => ({ id: x.id, name: x.name, rate: x.insp > 0 ? Math.round((100 * x.flag) / x.insp) : 0, flagged: x.flag }))
     .sort((a, z) => a.rate - z.rate);
   const rankPos = nearby.filter((x) => x.rate < rate).length + 1;
   const rankTotal = nearby.length + 1;
@@ -261,7 +272,7 @@ async function fullReport(c) {
         verdict,
         plain:
           `Flagged in ${c.flag} of ${c.insp} inspections (${rate}% violation rate) vs ` +
-          `${avg}% for ${c.cohort || "NYC centers"} — ${standingDisplay(verdict).toLowerCase()}.`,
+          `${avg}% for ${c.cohort || "NYC centers"} — ${standingDetailPhrase(verdict)}.`,
       },
       vs_nearby: {
         scope: scopeLabel,

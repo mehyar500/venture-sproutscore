@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- TRACKING:GA4-GTM -->
+<link rel="canonical" href="https://sproutscore.mehyar.us/report">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SproutScore">
+<meta property="og:title" content="SproutScore — Your decoded report">
+<meta property="og:description" content="Your SproutScore decoded daycare inspection report — the full plain-English breakdown of violations, standing, and what to ask on your tour.">
+<meta property="og:url" content="https://sproutscore.mehyar.us/report">
+<meta property="og:image" content="https://sproutscore.mehyar.us/assets/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SproutScore — Your decoded report">
+<meta name="twitter:description" content="Your SproutScore decoded daycare inspection report — the full plain-English breakdown of violations, standing, and what to ask on your tour.">
+<meta name="twitter:image" content="https://sproutscore.mehyar.us/assets/icon-512.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SproutScore — Your decoded report</title>
-<meta name="description" content="Your SproutScore decoded daycare inspection report.">
+<meta name="description" content="Your SproutScore decoded daycare inspection report — the full plain-English breakdown of violations, standing, and what to ask on your tour.">
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1412">
@@ -31,8 +43,11 @@
   <section class="centered hidden" id="denied">
     <p class="eyebrow">Private report</p>
     <h2>We couldn't open that report.</h2>
-    <p class="lede">The link is missing or expired. Your receipt email has the correct private link.</p>
-    <div class="actions"><a class="btn btn-primary" href="search.html">Search daycares</a></div>
+    <p class="lede">The link is missing, expired, or the records didn't load. Your receipt email has the correct private link — or check your connection and reload.</p>
+    <div class="actions">
+      <button class="btn btn-primary" type="button" onclick="window.location.reload()">Try again</button>
+      <a class="btn btn-ghost" href="search.html">Search daycares</a>
+    </div>
   </section>
 
   <div id="report" class="hidden">
@@ -49,10 +64,10 @@
     <section>
       <p class="eyebrow">Safety score</p>
       <div class="score-wrap">
-        <div class="score-ring" role="img" aria-label="Safety score">
+        <div class="score-ring" role="img" id="score-ring" aria-label="Safety score">
           <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
-            <circle id="score-arc" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+            <circle cx="60" cy="60" r="52" fill="none" style="stroke:var(--line)" stroke-width="10"/>
+            <circle id="score-arc" cx="60" cy="60" r="52" fill="none" style="stroke:var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
           </svg>
           <div class="score-num"><b id="score-num">–</b><span id="score-band">–</span></div>
         </div>
@@ -130,7 +145,7 @@
   var token = S.getQueryParam("token");
   var demo = S.getQueryParam("demo") === "1";
 
-  function sevLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function sevLabel(s) { s = String(s || "minor"); return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function bandColor(band) {
     return band === "A" ? "var(--accent)" : band === "B" ? "#a3e635" :
@@ -148,13 +163,16 @@
       (c.child_care_type ? " · " + c.child_care_type : "") + " · capacity " + (c.capacity || "—");
     document.getElementById("r-inspections").textContent = c.inspections;
     document.getElementById("r-last").textContent = S.fmtDate(c.last_inspection);
-    document.getElementById("r-asof").textContent = "Apr 24, 2023";
+    document.getElementById("r-asof").textContent = S.fmtDate(r.data_as_of) || "Apr 24, 2023";
 
-    // score ring
+    // score ring (style.stroke, not the stroke attribute: var() is invalid in
+    // SVG presentation attributes and silently falls back to black)
     var circ = 326.7;
     var arc = document.getElementById("score-arc");
     arc.style.strokeDashoffset = String(circ * (1 - r.score / 100));
-    arc.setAttribute("stroke", bandColor(r.band));
+    arc.style.stroke = bandColor(r.band);
+    document.getElementById("score-ring").setAttribute("aria-label",
+      "Safety score " + r.score + " out of 100, Grade " + r.band);
     document.getElementById("score-num").textContent = r.score;
     document.getElementById("score-band").textContent = "Grade " + r.band;
     document.getElementById("score-explain").textContent = r.score_explained;

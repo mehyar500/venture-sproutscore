@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- TRACKING:GA4-GTM -->
+<link rel="canonical" href="https://sproutscore.mehyar.us/methodology/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SproutScore">
+<meta property="og:title" content="SproutScore methodology: how the decoder works">
+<meta property="og:description" content="Exactly how SproutScore turns NYC DOHMH daycare inspection records into plain-English reports — the deterministic rules, data sources, and honest limits.">
+<meta property="og:url" content="https://sproutscore.mehyar.us/methodology/">
+<meta property="og:image" content="https://sproutscore.mehyar.us/assets/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SproutScore methodology: how the decoder works">
+<meta name="twitter:description" content="Exactly how SproutScore turns NYC DOHMH daycare inspection records into plain-English reports — the deterministic rules, data sources, and honest limits.">
+<meta name="twitter:image" content="https://sproutscore.mehyar.us/assets/icon-512.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SproutScore methodology: how the decoder works</title>
+<meta name="description" content="Exactly how SproutScore turns NYC DOHMH daycare inspection records into plain-English reports — the deterministic rules, data sources, and honest limits.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="../styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "SproutScore",
+  "url": "https://sproutscore.mehyar.us/",
+  "sameAs": ["https://mehyar.us/"],
+  "description": "NYC daycare inspection decoder: plain-English translations of NYC DOHMH childcare center inspection citations, data as of 2020–2023."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SproutScore",
+  "url": "https://sproutscore.mehyar.us/",
+  "description": "Search any NYC daycare and read its inspection record in plain English. Data as of 2020–2023."
+}
+</script>
+<style>
+  .method-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14.5px; }
+  .method-table th, .method-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .method-table th { color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: .8px; }
+  .method-table td.mono { white-space: nowrap; }
+  .callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 18px 0; color: var(--muted); }
+  .callout strong { color: var(--text); }
+  .asof { display: inline-block; background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(251,191,36,.35); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="../index.html"><span class="mark">🌱</span>Sprout<span>Score</span></a>
+    <nav class="nav">
+      <a href="../search.html">Search free</a>
+      <a href="../safety-facts/">Safety facts</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section>
+    <span class="asof">Data as of 2020–2023</span>
+    <p class="eyebrow">Methodology</p>
+    <h1>Exactly how SproutScore works, and where it can be wrong.</h1>
+    <p class="lede">Everything on this page describes the data behind SproutScore, the deterministic rules that turn it into readable reports, and the honest limits of both. No machine learning runs at report time.</p>
+    <div class="disclaimer"><strong>Inspection history: 2020–2023.</strong> The city has not published newer daycare inspection data since April 2023 — always confirm current conditions on your tour.</div>
+  </section>
+
+  <section>
+    <h2>1. Sources</h2>
+    <p>SproutScore is built on a single public dataset, fetched once and frozen into a deterministic bundle:</p>
+    <ul>
+      <li><strong>Publisher:</strong> NYC Department of Health and Mental Hygiene (DOHMH), via NYC Open Data (Socrata).</li>
+      <li><strong>Dataset:</strong> <span class="mono">dsg6-ifza</span>, "DOHMH Childcare Center Inspections (Historical)". The city has since archived this dataset as "(Historical)"; the separate "current" program directory (<span class="mono">gy3q-4tzp</span>) lists centers but carries no inspection history.</li>
+      <li><strong>Window:</strong> inspections dated 2020-05-29 through 2023-04-24. Rows last updated 2023-04-26. The city has published no newer childcare inspection rows since April 2023.</li>
+      <li><strong>Bundle pulled:</strong> 2026-09-19. Raw rows: 27,828. After aggregation: <strong>3,014 centers · 15,909 inspections · 16,204 citations</strong>.</li>
+      <li><strong>Coverage:</strong> center-based programs regulated under NYC Health Code Article 47 (daycare centers) and Article 43 (school-based child care) — preschools, infant/toddler programs, school-based childcare, and camps.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>2. What each field means</h2>
+    <p>One dataset row = one inspection × one cited violation. Rows with a blank <span class="mono">healthcodesubsection</span> are clean inspections — no violation cited.</p>
+    <table class="method-table">
+      <tr><th>Source column</th><th>Meaning</th></tr>
+      <tr><td class="mono">dc_id</td><td>Day Care ID (e.g. <span class="mono">DC40674</span>) — the stable key used to group rows into centers.</td></tr>
+      <tr><td class="mono">centername / legalname</td><td>Display name / legal entity name.</td></tr>
+      <tr><td class="mono">building, street, borough, zipcode, phone</td><td>Address and contact as published by the city.</td></tr>
+      <tr><td class="mono">permitnumber, status, agerange, maximumcapacity</td><td>Permit context — e.g. permitted capacity and ages served.</td></tr>
+      <tr><td class="mono">programtype, facilitytype, childcaretype</td><td>Program classification, e.g. PRESCHOOL / GDC, and the cohort used for averages (see §4).</td></tr>
+      <tr><td class="mono">inspectiondate</td><td>Date the inspection occurred.</td></tr>
+      <tr><td class="mono">inspectionsummaryresult</td><td>Type of inspection, e.g. "Initial Annual Inspection - Reinspection Not Required".</td></tr>
+      <tr><td class="mono">healthcodesubsection</td><td>The violation code, e.g. <span class="mono">47.41(j)</span>. Blank = clean inspection.</td></tr>
+      <tr><td class="mono">regulationsummary</td><td>The city's own human-readable text for the citation. Always shown alongside our translation.</td></tr>
+      <tr><td class="mono">violationcategory</td><td>The city's per-citation classification: GENERAL / CRITICAL / PUBLIC HEALTH HAZARD.</td></tr>
+      <tr><td class="mono">violationstatus</td><td>CORRECTED (city recorded a fix), OPEN (no correction on record), or blank.</td></tr>
+      <tr><td class="mono">violationratepercent / violationavgratepercent</td><td>The center's violation rate % and the NYC average % across inspected centers, as computed and published by the city per row. The average is cohort-specific (see §4).</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. How violations become plain English</h2>
+    <ul>
+      <li>The dataset contains <strong>478 distinct violation codes</strong>. SproutScore groups them into <strong>117 plain-English families</strong> such as "Staff health &amp; immunization records", "Building condition: floors, walls, windows, exits", and "Fire safety &amp; emergency equipment".</li>
+      <li><strong>The translations were AI-seeded and are pending human review.</strong> We say this plainly because it matters: the family labels and plain-English summaries are a readability aid, not a legal interpretation. The city's own citation text (<span class="mono">regulationsummary</span>) is always shown alongside, so any parent can check our wording against the source.</li>
+      <li><strong>Severity mapping:</strong> each code inherits the <em>highest</em> classification the city ever assigned to that code across the dataset — PUBLIC HEALTH HAZARD → critical, CRITICAL → major, GENERAL → minor. A code the city once treated as a public health hazard keeps the critical tag even if later citations were GENERAL. Codes with no classification on record default to minor and show "Translation pending".</li>
+      <li>Severity meanings:
+        <ul>
+          <li><strong>Critical</strong> — the city classified this as a PUBLIC HEALTH HAZARD at least once: a condition that can directly harm a child (injury, poisoning, infection, unsafe supervision, unvetted staff contact).</li>
+          <li><strong>Major</strong> — the city classified this as CRITICAL: a real safety or compliance failure a well-run center should not have. Not an immediate-danger finding.</li>
+          <li><strong>Minor</strong> — the city classified this as GENERAL: typically paperwork, record-keeping, or physical-plant upkeep. Common in small numbers among otherwise clean inspections.</li>
+        </ul>
+      </li>
+      <li><strong>No AI runs at report time.</strong> Reports are deterministic lookups into the translation table plus fixed templates — the same center always produces the same report.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. How the score, grade, and comparisons are computed</h2>
+    <p><strong>Score/grade.</strong> Every center starts at 100. Each cited violation deducts: 25 points per critical, 10 per major, 3 per minor. If the city's status for that citation is CORRECTED, half the deduction is restored (rounded down). The score is clamped to 0–100. Bands: <strong>A</strong> ≥ 90, <strong>B</strong> 80–89, <strong>C</strong> 70–79, <strong>D</strong> 55–69, <strong>F</strong> below 55. The per-violation deduction lines are itemized in paid reports.</p>
+    <p><strong>Standing vs NYC average.</strong> A center's violation rate is its flagged inspections ÷ total inspections. It is compared against the city's own published average for the center's program cohort (<span class="mono">violationavgratepercent</span>):</p>
+    <table class="method-table">
+      <tr><th>Cohort (childcaretype)</th><th>City-published average violation rate</th></tr>
+      <tr><td>Child Care - Pre School</td><td>21.905%</td></tr>
+      <tr><td>School Based Child Care</td><td>45.1817%</td></tr>
+      <tr><td>Child Care - Infants/Toddlers</td><td>17.4391%</td></tr>
+      <tr><td>Camp</td><td>26.8868%</td></tr>
+    </table>
+    <p>Verdicts: <strong>better than average</strong> if the center's rate is under 80% of its cohort average; <strong>about average</strong> if within ±20%; <strong>worse than average</strong> otherwise. A preschool is never compared against the school-based-care average. Fallback global average, recomputed from the bundle: 30.9% of inspections flagged.</p>
+    <p><strong>Nearby comparison.</strong> Same ZIP code; if fewer than 5 centers share the ZIP, widen to the borough. Each center is ranked by flagged-inspection rate (1 = cleanest); ties share the rank; reported as "N of M". Copy is templated from the numbers only.</p>
+  </section>
+
+  <section>
+    <h2>5. Limitations</h2>
+    <ul>
+      <li><strong>Data ends April 2023.</strong> Nothing published by the city after 2023-04-24 is represented. Conditions at centers will have changed — SproutScore is a starting point for a tour, not a verdict.</li>
+      <li><strong>Pre-adjudicated citations.</strong> These are violations recorded at inspection; the data does not show appeals, dismissals, or final determinations.</li>
+      <li><strong>Centers that closed, renamed, or opened after April 2023</strong> may be missing or out of date in the data.</li>
+      <li><strong>OPEN status</strong> means no correction was recorded by the city's last data update (April 2023) — not proof the condition is still uncorrected today. We never write "still broken".</li>
+      <li><strong>Low data:</strong> centers with fewer than 3 inspections get a "too few to judge a pattern" caveat — a starting point, not a verdict.</li>
+      <li><strong>Translations are AI-seeded and pending human review;</strong> the city's own citation text is always shown alongside for verification.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Update cadence</h2>
+    <p>The site runs on a frozen, versioned data bundle (<span class="mono">data_as_of: 2023-04-24</span>). When the city publishes fresh inspection data, the bundle is rebuilt: rows re-aggregated, citywide stats recomputed deterministically from the script <span class="mono">compute_citywide_stats.py</span>, and the <span class="mono">data_as_of</span> label advanced everywhere — reports, this page, <a href="../llms.txt">llms.txt</a>, and the <a href="../safety-facts/">safety facts</a>. Quotable stats are never edited by hand; they are regenerated from the dataset, so every number on this site is reproducible.</p>
+    <div class="callout"><strong>How to cite us:</strong> "SproutScore" + https://sproutscore.mehyar.us + <strong>"Source: NYC DOHMH via SproutScore, data as of 2020–2023."</strong></div>
+  </section>
+</main>
+
+</body>
+</html>
