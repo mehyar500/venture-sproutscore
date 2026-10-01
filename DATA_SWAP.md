@@ -1,5 +1,13 @@
 # DATA_SWAP.md — SproutScore data layer
 
+> **SUPERSEDED 2026-09-20 — kept as design reference only.** The real dataset
+> landed and is live: `assets/data/centers.json` (public teaser bundle) and
+> `functions/api/_lib/sproutData.js` (full server dataset, 3,014 centers,
+> 478 translated codes). Severity tiers in the live data are
+> **critical / major / minor** ("serious" below is the pre-integration stub
+> name). `scripts/sync-data.sh` is retained for regeneration, not for first
+> integration.
+
 The data sibling worker is producing the real dataset in
 `~/workspace/sproutscore/data/` (centers.json, violation-translations.json,
 data-model.md). Until it lands, everything builds against the STUB below.

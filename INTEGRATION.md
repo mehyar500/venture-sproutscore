@@ -15,7 +15,8 @@ How the centralized mehyar.us checkout/webhook talks to the SproutScore PWA.
 - `allowed_return_hosts`: `sproutscore.mehyar.us`
 - Seed SQL lives in `schema.sql` (sibling worker owns the actual D1 seed).
 - **Price comes only from D1.** The frontend displays $19/$29 as a mirror of
-  these rows; the webhook charges what D1 says.
+  these rows (verified live 2026-09-30: `sproutscore-report`=1900¢, `sproutscore-3pack`=2900¢);
+  the webhook charges what D1 says.
 
 ## Checkout (frontend → mehyar.us)
 

@@ -167,3 +167,104 @@ PENDING_MAYOR_REVIEW — Mayor must spot-check severity tiers + tour questions
 for top families (47.33, 47.41, 47.37, 47.25, 47.19) before launch; live
 payment-status polling still unexercised from sandbox; production D1 tables
 still unconfirmed.
+
+## Pass 5 — 2026-09-30: product-excellence hardening (workstream 1)
+
+Thirteen fixes applied, then a 13-shot critique pass at 390×844
+(`screenshots/pass5/`), zero horizontal overflow verified on all 8 pages.
+
+**Bugs fixed:**
+- **3-pack price truth: $39 → $29.** D1 (`mehyar_leads_prod`, read live
+  2026-09-30) charges `sproutscore-3pack` = 2900¢. The frontend advertised $39
+  while the webhook would charge $29. Fixed everywhere: `app.js`
+  (`PRICE_3PACK = 29`), `index.html` price card, `center.html` 3-pack card +
+  button, `terms.html`, `drip/04-last-call.{txt,html}`, `schema.sql` seed
+  (3900→2900), `INTEGRATION.md` (table + "$19/$39" line), `README.md`.
+- **Severity styling gap (major was unstyled).** Data tiers are
+  critical/major/minor, but CSS only styled `.sev-serious` (a pre-integration
+  name, dead) — major flags got a minor-colored border with an unstyled tag.
+  Added `.sev-major` rules to the flags list and the report violation cards;
+  removed the dead `.sev-serious` selectors. Verified visually (gold MAJOR
+  tags + gold left borders) in pass-5 screenshots.
+- **Score-ring `var()` in SVG presentation attribute.** `report.html` set
+  `stroke="var(--line)"` and `arc.setAttribute("stroke", bandColor(...))` —
+  invalid; browsers fall back to black. Moved both to `style.stroke` and set
+  the ring's `aria-label` dynamically ("Safety score 6 out of 100, Grade F").
+  Verified programmatically: computed arc stroke = rgb(251, 113, 133) (crit).
+- **Report "as of" date** now comes from `r.data_as_of` (was hardcoded
+  "Apr 24, 2023").
+- **Tour questions** on center.html now always pad to exactly 3 (header
+  promises "Your 3 free tour questions").
+- **Offline state** on center.html: fetch failure now shows a "We couldn't
+  reach the records" section with a retry button instead of the misleading
+  "not found" section; report.html's denied state gained a retry button too.
+- **Accessibility:** token input on success.html got an `aria-label`;
+  `:focus-visible` accent outlines on links/buttons/summary/inputs.
+- **Print CSS** hardened for the report: `.vcode`, `.lede`, `.hero-proof`,
+  `.flag-meta`, `.rmeta`, `.disclaimer`, `.standing .data-asof` all print
+  dark-on-white; `.share-card` and `.sample-banner` lose their dark/gold
+  treatments; status pills get print-safe colors.
+- **Honest funnel copy:** index FAQ "Is the free search really free?" now
+  matches the blur-gated funnel (counts revealed after the free email reveal);
+  free-tier list item reads "Free email reveal: inspection + flagged counts".
+- **SW data freshness:** `/assets/data/*` is now network-first (was
+  cache-first, so a future data swap would never reach returning visitors);
+  cache bumped to `sproutscore-v2`.
+- **package.json `"type": "module"`** — kills the MODULE_TYPELESS_PACKAGE_JSON
+  reparse warning in flow-test/funnel-test/shoot.
+- **Dead CSS removed:** `.rflags .ok`, `.rflags .bad` (unused — search rows
+  never show counts), duplicate trailing `.centered` definition.
+- **Docs:** README (stale "currently empty" data dir, wrong dataset filename,
+  "14 checks" → 17, $39 → $29), INTEGRATION.md ($39 → $29), DATA_SWAP.md
+  marked SUPERSEDED (post-integration reference only).
+
+**Tests:** flow-test **17/17**, funnel-test **15/15**. New
+`scripts/audit-pages.mjs`: zero horizontal overflow on 9 URLs
+(all 8 pages + center-revealed), dynamic aria-label, arc stroke — ALL PASS.
+
+**Bundle sizes after pass 5:** centers.json 2.04MB raw / 204KB gzip
+(no regression — public/private split intact, no decodes in public bundle);
+sproutData.js 3.16MB (untouched); styles.css 16.9KB raw / 4.2KB gzip.
+
+**Verdict: fixes verified, no new issues — but the print-PDF review exposed a
+real data-truth bug, fixed in pass 6.**
+
+## Pass 6 — 2026-09-30: violation-rate truth fix (found via print PDF)
+
+**The bug:** the print PDF showed "Flagged in 11 of 17 inspections (0%
+violation rate) — better than the NYC average." The `rate` field comes from
+the city's opaque per-row `violationratepercent` (NUESTROS NINOS's latest row
+says 0), and the copy juxtaposed it with our own flagged/insp counts —
+internally contradictory ("11 of 17 = 0%") and actively misleading: a center
+flagged in 11 of 17 inspections was rated BETTER than average, and ranked #1
+("cleaner than most nearby") in its ZIP.
+**The fix (my scope only — sibling owns the generator):**
+- `functions/api/_lib/data.js`: `teaserOf`, `fullReport`, and the nearby
+  ranking now compute the center's violation rate as
+  `round(100 * flag / insp)` from our own inspection counts instead of the
+  city's per-row value. NUESTROS: "Flagged in 11 of 17 inspections (65%
+  violation rate) vs 21.9% — worse than the NYC average"; nearby rank flips to
+  a truthful 42 of 47. DC1000 teaser: 2 of 6 → 33% (was the city's 50%).
+- `assets/data/centers.json`: all 3,014 public teaser entries had the buggy
+  `standing` / `standing_display` / `standing_detail` strings baked in.
+  `scripts/fix-standing.mjs` recomputed them with the same logic (insp, flag,
+  cohort were already in each entry — nothing invented). 0 inconsistent
+  entries; verdict distribution now 1356 worse / 489 near / 1169 better.
+- Cohort average rounded to 1 decimal ("21.905%" → "21.9%").
+- Standing detail phrase keeps "NYC" capitalized ("worse than the NYC
+  average", not "the nyc average").
+**Carry for the sibling worker:** their generator (`build-sproutscore-bundle.js`
+/ `gen_centers.py` chain) still bakes the city's `violationratepercent` into
+`rate` and into the SEO `centers/` pages' standing copy — the next data regen
+would reintroduce the wrong verdicts there. Flag for a generator-side fix.
+**Tests:** flow-test **17/17**, funnel-test **15/15**, audit-pages ALL PASS.
+Screenshots pass6 (13 shots, re-shot after the fix) reviewed: revealed teaser
+reads "Flagged in 2 of 6 inspections (33% violation rate) vs 21.9% — worse
+than the NYC average"; MAJOR tags gold; score ring arc red; print PDF clean.
+
+**Verdict: READY.** 13 planned fixes + 1 data-truth bug, all verified by tests
+and two screenshot critique passes. Deliberately unfixed: sibling `centers/`
+SEO copy (their files, flagged above); translations still PENDING_MAYOR_REVIEW
+(pre-existing); live payment-status polling still unexercised from sandbox
+(pre-existing). Do NOT deploy from this workstream — coordinator runs the
+single final deploy.

@@ -7,8 +7,9 @@ const PRODUCT_REPORT = "sproutscore-report";
 const PRODUCT_3PACK = "sproutscore-3pack";
 const PRICE_REPORT = 19;
 const PRICE_3PACK = 29;
-// Prices are display mirrors of the billing_products rows (sibling worker
-// registers the SKUs; the webhook charges only what D1 says).
+// Prices are display mirrors of the billing_products rows (verified against D1
+// mehyar_leads_prod 2026-09-30: sproutscore-report=1900¢, sproutscore-3pack=2900¢;
+// sibling worker registers the SKUs; the webhook charges only what D1 says).
 
 async function startCheckout({ product_id, email, center_id, center_name, test }) {
   const body = {

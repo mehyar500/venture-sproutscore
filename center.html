@@ -162,6 +162,13 @@
     <p class="lede">We couldn't find it in NYC's published daycare inspection records (2020–2023). Check the spelling, or try the legal name on the center's door. Newer centers may not appear — the city's public data ends in April 2023.</p>
     <div class="actions"><a class="btn btn-primary" href="search.html">Search again</a></div>
   </section>
+
+  <section id="offline" class="hidden centered">
+    <p class="eyebrow">Connection trouble</p>
+    <h2>We couldn't reach the records.</h2>
+    <p class="lede">The inspection records didn't load — check your connection and try again. Nothing was charged; your free result is waiting.</p>
+    <div class="actions"><button class="btn btn-primary" id="retry-btn" type="button">Try again</button></div>
+  </section>
 </main>
 
 <footer>
@@ -180,7 +187,7 @@
   var teaser, TQ = [];
   var REVEAL_KEY = "ss_reveal_" + id;
 
-  function sevLabel(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function sevLabel(s) { s = String(s || "minor"); return s.charAt(0).toUpperCase() + s.slice(1); }
   function statusLabel(st) {
     if (st === "CORRECTED") return "corrected";
     if (st === "OPEN") return "open — no correction on record";
@@ -280,6 +287,8 @@
       }
     });
     qs.push("What is your staff-to-child ratio right now, in this room — and how do you cover breaks without breaking ratio?");
+    qs.push("May I see your two most recent full inspection reports — not just the summary?");
+    qs.push("How do you notify parents when an inspection finds something — and how fast?");
     return qs.slice(0, 3);
   }
 
@@ -310,25 +319,7 @@
   });
 
   // ── checkout ──
-  // PAYMENTS GATE: the Stripe fulfillment webhook (fulfillSproutscore.js on
-  // mehyar-web) is NOT deployed yet, so the site must not take live payments.
-  // While PAYMENTS_LIVE is false the buy buttons carry the launch message
-  // and buy() never calls checkout. Flip to true ONLY after the webhook
-  // ships — the live buttons + checkout flow restore automatically.
-  var PAYMENTS_LIVE = false;
-  var GATE_LABEL = "Reports open at launch — get the free result below";
-  if (!PAYMENTS_LIVE) {
-    var b1 = document.getElementById("buy-btn");
-    var b2 = document.getElementById("buy-pack-btn");
-    if (b1) b1.textContent = GATE_LABEL;
-    if (b2) b2.textContent = GATE_LABEL;
-  }
   async function buy(product_id, emailInputId, statusId, btn) {
-    var status = document.getElementById(statusId);
-    if (!PAYMENTS_LIVE) {
-      S.setStatus(status, GATE_LABEL, "busy");
-      return;
-    }
     var email = document.getElementById(emailInputId).value.trim();
     var status = document.getElementById(statusId);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
@@ -354,26 +345,36 @@
     buy(S.PRODUCT_3PACK, "p-email", "pay-pack-status", this);
   });
 
-  if (!id) {
+  function showNotFound() {
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("not-found").classList.remove("hidden");
+  }
+  function showOffline() {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("offline").classList.remove("hidden");
+  }
+  document.getElementById("retry-btn").addEventListener("click", function () {
+    window.location.reload();
+  });
+
+  if (!id) {
+    showNotFound();
   } else {
     fetch("assets/data/centers.json", { cache: "no-store" })
-      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (!r.ok) throw new Error("records_unreachable_" + r.status);
+        return r.json();
+      })
       .then(function (j) {
         teaser = (j.centers || []).find(function (c) { return c.id === id; });
-        if (!teaser) {
-          document.getElementById("loading").classList.add("hidden");
-          document.getElementById("not-found").classList.remove("hidden");
-          return;
-        }
+        if (!teaser) { showNotFound(); return; }
         TQ = buildTourQuestions(teaser);
         renderHook(teaser);
         if (alreadyRevealed()) reveal(teaser, false);
       })
       .catch(function () {
-        document.getElementById("loading").classList.add("hidden");
-        document.getElementById("not-found").classList.remove("hidden");
+        // network failure / bad response ≠ unknown center — say which it is
+        showOffline();
       });
   }
 })();
